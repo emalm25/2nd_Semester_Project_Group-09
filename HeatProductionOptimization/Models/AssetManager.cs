@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 
 public class HeatingGrid
 {
@@ -25,7 +27,7 @@ public class ProductionUnit
     public virtual double? OilConsumption => null;
     public virtual double? Gas2Consumption => null;
     public virtual double? MaxElectricity => null;
-    public virtual string Image => "Assets/ProductionUnits/no-image.png";
+    public virtual Bitmap Image => new Bitmap(AssetLoader.Open(new Uri("avares://HeatProductionOptimization/Assets/ProductionUnits/no-image.png")));
 
     public ProductionUnit(string ShortName, string Name, double MaxHeat, decimal ProductionCosts,double? CO2Emissions )
     {
@@ -41,12 +43,12 @@ public class GasBoilersInfo : ProductionUnit
 {
     private double _gasConsumption;
     public override double? GasConsumption => _gasConsumption;
-    public override string Image => "Assets/ProductionUnits/gas-boiler-image.png";
+    public override Bitmap Image => new Bitmap(AssetLoader.Open(new Uri("avares://HeatProductionOptimization/Assets/ProductionUnits/gas-boiler-image.png")));
 
     public GasBoilersInfo(string ShortName, string Name, double MaxHeat, decimal ProductionCosts, double CO2Emissions, double GasConsumption)
     : base(ShortName, Name, MaxHeat, ProductionCosts, CO2Emissions)
     {
-        this._gasConsumption = GasConsumption;
+        _gasConsumption = GasConsumption;
     }
 }
 
@@ -54,12 +56,12 @@ public class OilBoilerInfo : ProductionUnit
 {
     private double _oilConsumption;
     public override double? OilConsumption => _oilConsumption;
-    public override string Image => "Assets/ProductionUnits/oil-boiler-image.png";
+    public override Bitmap Image => new Bitmap(AssetLoader.Open(new Uri("avares://HeatProductionOptimization/Assets/ProductionUnits/oil-boiler-image.png")));
 
     public OilBoilerInfo(string ShortName, string Name, double MaxHeat, decimal ProductionCosts, double CO2Emissions, double OilConsumption)
     : base(ShortName, Name, MaxHeat, ProductionCosts, CO2Emissions)
     {
-        this._oilConsumption = OilConsumption;
+        _oilConsumption = OilConsumption;
     }
 }
 
@@ -70,13 +72,13 @@ public class GasMotorInfo : ProductionUnit
     
     public override double? Gas2Consumption => _gas2Consumption;
     public override double? MaxElectricity => _maxElectricity;
-    public override string Image => "Assets/ProductionUnits/gas-motor-image.png";
+    public override Bitmap Image => new Bitmap(AssetLoader.Open(new Uri("avares://HeatProductionOptimization/Assets/ProductionUnits/gas-motor-image.png")));
 
     public GasMotorInfo(string ShortName, string Name, double MaxHeat, double MaxElectricity, decimal ProductionCosts, double CO2Emissions, double Gas2Consumption)
     : base(ShortName, Name, MaxHeat, ProductionCosts, CO2Emissions)
     {
-        this._gas2Consumption = Gas2Consumption;
-        this._maxElectricity = MaxElectricity;
+        _gas2Consumption = Gas2Consumption;
+        _maxElectricity = MaxElectricity;
     }
 }
 
@@ -84,12 +86,12 @@ public class ElectricBoilerInfo : ProductionUnit
 {
     private double _maxElectricity;
     public override double? MaxElectricity => _maxElectricity;
-    public override string Image => "Assets/ProductionUnits/electric-boiler-image.png";
+    public override Bitmap Image => new Bitmap(AssetLoader.Open(new Uri("avares://HeatProductionOptimization/Assets/ProductionUnits/electric-boiler-image.png")));
     
     public ElectricBoilerInfo(string ShortName, string Name, double MaxHeat, double MaxElectricity, decimal ProductionCost )
     : base(ShortName, Name, MaxHeat, ProductionCost, null)
     {
-        this._maxElectricity = MaxElectricity;
+        _maxElectricity = MaxElectricity;
     }
 }
 

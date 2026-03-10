@@ -1,0 +1,97 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:HeatProductionOptimization.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="HeatProductionOptimization.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/Danfoss-logo.ico"
+        Title="Welcome to our heat production optimizer">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <!-- styles for tabs -->
+    <Window.Styles>
+        <Styles>
+            <!-- make each tab header a white rectangle with black text and border -->
+            <Style Selector="TabItem">
+                <Setter Property="Background" Value="White"/>
+                <Setter Property="Foreground" Value="Black"/>
+                <Setter Property="BorderBrush" Value="Black"/>
+                <Setter Property="BorderThickness" Value="0.5"/>
+                <Setter Property="Padding" Value="8,4"/>
+            </Style>
+            <!-- optional: adjust TabControl chrome if needed -->
+            <Style Selector="TabControl">
+                <Setter Property="TabStripPlacement" Value="Top"/>
+            </Style>
+        </Styles>
+    </Window.Styles>
+
+    <!-- main window content replaced with tabs for each manager -->
+    <TabControl>
+
+        <TabItem Header="Welcome" IsSelected="True">
+            <TextBlock Text="Welcome to our heat production optimizer!" Margin="10" FontSize="18" Foreground="White"/>
+        </TabItem>
+
+        <TabItem Header="Asset manager">
+        <StackPanel>
+            <StackPanel HorizontalAlignment="Center">
+                <TextBlock Text="Asset manager information" Margin="10"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="20" HorizontalAlignment="Center">
+
+                <Border BorderBrush="Black" BorderThickness="1">
+                    <TextBlock Text="Gas Boiler 1" FontSize="20" Margin="10"/>
+                </Border>
+
+                <Border BorderBrush="Black" BorderThickness="1">
+                    <TextBlock Text="Gas Boiler 2" FontSize="20" Margin="10"/>
+                </Border>
+
+                <Border BorderBrush="Black" BorderThickness="1">
+                    <TextBlock Text="Gas Boiler 3" FontSize="20" Margin="10"/>
+                </Border>
+                
+                <Border BorderBrush="Black" BorderThickness="1">
+                    <TextBlock Text="Oil Boiler 1" FontSize="20" Margin="10"/>
+                </Border>
+
+                <Border BorderBrush="Black" BorderThickness="1">
+                    <TextBlock Text="Gas Motor 1" FontSize="20" Margin="10"/>
+                </Border>
+
+                <Border BorderBrush="Black" BorderThickness="1">
+                    <TextBlock Text="Electric Boiler 1" FontSize="20" Margin="10"/>
+                </Border>
+            
+            </StackPanel>
+        </StackPanel>
+        </TabItem>
+
+        <TabItem Header="Source Data Manager">
+            <TextBlock Text="Source data manager information" Margin="10"/>
+        </TabItem>
+
+        <TabItem Header="Result Data Manager">
+            <TextBlock Text="Result data manager information" Margin="10"/>
+        </TabItem>
+
+        <TabItem Header="Optimizer">
+            <TextBlock Text="Optimize data here" Margin="10"/>
+        </TabItem>
+
+        <TabItem Header="Data Visualization">
+            <TextBlock Text="Visualize data here" Margin="10"/>
+        </TabItem>
+
+    </TabControl>
+
+</Window>
+

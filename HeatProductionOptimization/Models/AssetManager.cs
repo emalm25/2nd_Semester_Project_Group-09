@@ -19,6 +19,13 @@ public class ProductionUnit
     public double MaxHeat {get; private set;}
     public decimal ProductionCosts {get; private set;}
     public double? CO2Emissions {get; private set;}
+    
+    // Virtual properties for specific unit types
+    public virtual double? GasConsumption => null;
+    public virtual double? OilConsumption => null;
+    public virtual double? Gas2Consumption => null;
+    public virtual double? MaxElectricity => null;
+    public virtual string Image => "Assets/ProductionUnits/no-image.png";
 
     public ProductionUnit(string ShortName, string Name, double MaxHeat, decimal ProductionCosts,double? CO2Emissions )
     {
@@ -30,61 +37,67 @@ public class ProductionUnit
     }
 }
 
-    public class GasBoilersInfo : ProductionUnit
+public class GasBoilersInfo : ProductionUnit
+{
+    private double _gasConsumption;
+    public override double? GasConsumption => _gasConsumption;
+    public override string Image => "Assets/ProductionUnits/gas-boiler-image.png";
+
+    public GasBoilersInfo(string ShortName, string Name, double MaxHeat, decimal ProductionCosts, double CO2Emissions, double GasConsumption)
+    : base(ShortName, Name, MaxHeat, ProductionCosts, CO2Emissions)
     {
-        public double GasConsumption { get; private set;}
-
-        public GasBoilersInfo(string ShortName, string Name, double MaxHeat, decimal ProductionCosts, double CO2Emissions, double GasConsumption)
-        : base(ShortName, Name, MaxHeat, ProductionCosts, CO2Emissions)
-        {
-            this.GasConsumption = GasConsumption;
-        }
-       
+        this._gasConsumption = GasConsumption;
     }
+}
 
+public class OilBoilerInfo : ProductionUnit
+{
+    private double _oilConsumption;
+    public override double? OilConsumption => _oilConsumption;
+    public override string Image => "Assets/ProductionUnits/oil-boiler-image.png";
 
-    public class OilBoilerInfo : ProductionUnit
+    public OilBoilerInfo(string ShortName, string Name, double MaxHeat, decimal ProductionCosts, double CO2Emissions, double OilConsumption)
+    : base(ShortName, Name, MaxHeat, ProductionCosts, CO2Emissions)
     {
-        public double OilConsumption { get; private set;}
-
-        public OilBoilerInfo(string ShortName, string Name, double MaxHeat, decimal ProductionCosts, double CO2Emissions, double OilConsumption)
-        : base(ShortName, Name, MaxHeat, ProductionCosts, CO2Emissions)
-        {
-            this.OilConsumption = OilConsumption;
-        }
-
-
+        this._oilConsumption = OilConsumption;
     }
+}
 
-      public class GasMotorInfo : ProductionUnit
-    {
-        public double Gas2Consumption { get; private set;}
-        public double MaxElectricity { get; private set;}
-
-        public GasMotorInfo(string ShortName, string Name, double MaxHeat, double MaxElectricity, decimal ProductionCosts, double CO2Emissions, double Gas2Consumption)
-        : base(ShortName, Name, MaxHeat, ProductionCosts, CO2Emissions)
-        {
-            this.Gas2Consumption = Gas2Consumption;
-            this.MaxElectricity = MaxElectricity;
-        }
-
-
-    }
-
-    public class ElectricBoilerInfo : ProductionUnit
-    {
-        public double MaxElectricity { get; private set; }
-        public ElectricBoilerInfo(string ShortName, string Name, double MaxHeat, double MaxElectricity, decimal ProductionCost )
-        : base(ShortName, Name, MaxHeat, ProductionCost, null)
-        {
-            this.MaxElectricity = MaxElectricity;
-        }
-    }
-        public class AssetManager
-        {
+public class GasMotorInfo : ProductionUnit
+{
+    private double _gas2Consumption;
+    private double _maxElectricity;
     
-           public List<ProductionUnit> Units { get; } = new List<ProductionUnit>
-        {
+    public override double? Gas2Consumption => _gas2Consumption;
+    public override double? MaxElectricity => _maxElectricity;
+    public override string Image => "Assets/ProductionUnits/gas-motor-image.png";
+
+    public GasMotorInfo(string ShortName, string Name, double MaxHeat, double MaxElectricity, decimal ProductionCosts, double CO2Emissions, double Gas2Consumption)
+    : base(ShortName, Name, MaxHeat, ProductionCosts, CO2Emissions)
+    {
+        this._gas2Consumption = Gas2Consumption;
+        this._maxElectricity = MaxElectricity;
+    }
+}
+
+public class ElectricBoilerInfo : ProductionUnit
+{
+    private double _maxElectricity;
+    public override double? MaxElectricity => _maxElectricity;
+    public override string Image => "Assets/ProductionUnits/electric-boiler-image.png";
+    
+    public ElectricBoilerInfo(string ShortName, string Name, double MaxHeat, double MaxElectricity, decimal ProductionCost )
+    : base(ShortName, Name, MaxHeat, ProductionCost, null)
+    {
+        this._maxElectricity = MaxElectricity;
+    }
+}
+
+public class AssetManager
+{
+
+   public List<ProductionUnit> Units { get; } = new List<ProductionUnit>
+{
             new GasBoilersInfo("GB1", "Gas Boiler 1", 3.0 , 510, 132, 1.05),
             new GasBoilersInfo("GB2", "Gas Boiler 2", 2.0 , 540, 134, 1.08),
             new GasBoilersInfo("GB3", "Gas Boiler 3", 4.0 , 580, 136, 1.09),

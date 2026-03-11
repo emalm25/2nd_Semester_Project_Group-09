@@ -17,25 +17,14 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = HeatProductionOptimization
-<<<<<<< Updated upstream
-build_property.ProjectDir = C:\Users\Msi\OneDrive\Documents\GitHub\2nd_Semester_Project_Group-09\HeatProductionOptimization\
-=======
-build_property.ProjectDir = c:\Users\Msi\OneDrive\Documents\GitHub\2nd_Semester_Project_Group-09\HeatProductionOptimization\
->>>>>>> Stashed changes
+build_property.ProjectDir = C:\Users\nojus\OneDrive\Documents\2nd_Semester_Project_Group-09\HeatProductionOptimization\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
 
-<<<<<<< Updated upstream
-[C:/Users/Msi/OneDrive/Documents/GitHub/2nd_Semester_Project_Group-09/HeatProductionOptimization/App.axaml]
+[C:/Users/nojus/OneDrive/Documents/2nd_Semester_Project_Group-09/HeatProductionOptimization/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/Msi/OneDrive/Documents/GitHub/2nd_Semester_Project_Group-09/HeatProductionOptimization/Views/MainWindow.axaml]
-=======
-[c:/Users/Msi/OneDrive/Documents/GitHub/2nd_Semester_Project_Group-09/HeatProductionOptimization/App.axaml]
-build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
-
-[c:/Users/Msi/OneDrive/Documents/GitHub/2nd_Semester_Project_Group-09/HeatProductionOptimization/Views/MainWindow.axaml]
->>>>>>> Stashed changes
+[C:/Users/nojus/OneDrive/Documents/2nd_Semester_Project_Group-09/HeatProductionOptimization/Views/MainWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

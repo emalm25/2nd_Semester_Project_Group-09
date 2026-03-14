@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "lU6BtaaD6MQ=",
+  "dgSpecHash": "NfAToLW+7Fo=",
   "success": true,
   "projectFilePath": "C:\\Users\\valer\\Documents\\GitHub\\2nd_Semester_Project_Group-09\\HeatProductionOptimization\\HeatProductionOptimization.csproj",
   "expectedPackageFiles": [
@@ -20,6 +20,7 @@
     "C:\\Users\\valer\\.nuget\\packages\\avalonia.win32\\11.3.12\\avalonia.win32.11.3.12.nupkg.sha512",
     "C:\\Users\\valer\\.nuget\\packages\\avalonia.x11\\11.3.12\\avalonia.x11.11.3.12.nupkg.sha512",
     "C:\\Users\\valer\\.nuget\\packages\\communitytoolkit.mvvm\\8.2.1\\communitytoolkit.mvvm.8.2.1.nupkg.sha512",
+    "C:\\Users\\valer\\.nuget\\packages\\csvhelper\\33.1.0\\csvhelper.33.1.0.nupkg.sha512",
     "C:\\Users\\valer\\.nuget\\packages\\harfbuzzsharp\\8.3.1.1\\harfbuzzsharp.8.3.1.1.nupkg.sha512",
     "C:\\Users\\valer\\.nuget\\packages\\harfbuzzsharp.nativeassets.linux\\8.3.1.1\\harfbuzzsharp.nativeassets.linux.8.3.1.1.nupkg.sha512",
     "C:\\Users\\valer\\.nuget\\packages\\harfbuzzsharp.nativeassets.macos\\8.3.1.1\\harfbuzzsharp.nativeassets.macos.8.3.1.1.nupkg.sha512",
@@ -33,5 +34,15 @@
     "C:\\Users\\valer\\.nuget\\packages\\skiasharp.nativeassets.win32\\2.88.9\\skiasharp.nativeassets.win32.2.88.9.nupkg.sha512",
     "C:\\Users\\valer\\.nuget\\packages\\tmds.dbus.protocol\\0.21.2\\tmds.dbus.protocol.0.21.2.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "message": "Problem reading the cache file C:\\Users\\valer\\Documents\\GitHub\\2nd_Semester_Project_Group-09\\HeatProductionOptimization\\obj\\project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0.",
+      "projectPath": "C:\\Users\\valer\\Documents\\GitHub\\2nd_Semester_Project_Group-09\\HeatProductionOptimization\\HeatProductionOptimization.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\valer\\Documents\\GitHub\\2nd_Semester_Project_Group-09\\HeatProductionOptimization\\HeatProductionOptimization.csproj",
+      "targetGraphs": []
+    }
+  ]
 }

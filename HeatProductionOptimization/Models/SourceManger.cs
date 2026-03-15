@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using CsvHandler;
 using System.Data;
 using Microsoft.VisualBasic;
+using System.Globalization;
+using System.IO;
 
 public class Data
 {
@@ -17,6 +20,19 @@ public class Data
         this.HeatDemand = HeatDemand;
         this.ElectricityPrice = ElectricityPrice;
     }
-
+  
 
 }
+  public class SourceManager
+    {
+        public List<Data> GetWinterData()
+        {
+            return Csvreader.CSVReadHandle("SourceWinterData.csv");
+        }
+
+        public List<Data> GetSummerData()
+        {
+            return Csvreader.CSVReadHandle("SourceSummerData.csv");
+        }
+        
+    }

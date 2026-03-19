@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\nojus\\OneDrive\\Documents\\2nd_Semester_Project_Group-09\\HeatProductionOptimization\\HeatProductionOptimization.csproj": {}
+    "C:\\Users\\valer\\Documents\\GitHub\\2nd_Semester_Project_Group-09\\HeatProductionOptimization\\HeatProductionOptimization.csproj": {}
   },
   "projects": {
-    "C:\\Users\\nojus\\OneDrive\\Documents\\2nd_Semester_Project_Group-09\\HeatProductionOptimization\\HeatProductionOptimization.csproj": {
+    "C:\\Users\\valer\\Documents\\GitHub\\2nd_Semester_Project_Group-09\\HeatProductionOptimization\\HeatProductionOptimization.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nojus\\OneDrive\\Documents\\2nd_Semester_Project_Group-09\\HeatProductionOptimization\\HeatProductionOptimization.csproj",
+        "projectUniqueName": "C:\\Users\\valer\\Documents\\GitHub\\2nd_Semester_Project_Group-09\\HeatProductionOptimization\\HeatProductionOptimization.csproj",
         "projectName": "HeatProductionOptimization",
-        "projectPath": "C:\\Users\\nojus\\OneDrive\\Documents\\2nd_Semester_Project_Group-09\\HeatProductionOptimization\\HeatProductionOptimization.csproj",
-        "packagesPath": "C:\\Users\\nojus\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nojus\\OneDrive\\Documents\\2nd_Semester_Project_Group-09\\HeatProductionOptimization\\obj\\",
+        "projectPath": "C:\\Users\\valer\\Documents\\GitHub\\2nd_Semester_Project_Group-09\\HeatProductionOptimization\\HeatProductionOptimization.csproj",
+        "packagesPath": "C:\\Users\\valer\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\valer\\Documents\\GitHub\\2nd_Semester_Project_Group-09\\HeatProductionOptimization\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\nojus\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\valer\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
@@ -66,7 +66,11 @@
             },
             "CommunityToolkit.Mvvm": {
               "target": "Package",
-              "version": "[8.2.1, )"
+              "version": "[8.4.0, )"
+            },
+            "CsvHelper": {
+              "target": "Package",
+              "version": "[33.1.0, )"
             }
           },
           "imports": [
@@ -85,7 +89,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.102/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",

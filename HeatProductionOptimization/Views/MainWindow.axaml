@@ -62,7 +62,7 @@
         </TabItem>
 
         <TabItem Header="Result Data Manager">
-            <TextBlock Text="Result data manager information" Margin="10" FontSize="18" Foreground="White"/>
+            <views:ResultDataManagerView DataContext="{Binding ResultDataManagerVM}" />
         </TabItem>
 
         <TabItem Header="Optimizer">

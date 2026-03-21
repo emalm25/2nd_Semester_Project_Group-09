@@ -1,0 +1,37 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:HeatProductionOptimization.ViewModels"
+    x:Class="HeatProductionOptimization.Views.ResultDataManagerView"
+    x:DataType="vm:ResultDataManagerViewModel">
+
+    <ScrollViewer>
+        <StackPanel Margin="20" Spacing="10">
+            <TextBlock Text="Result Data Manager" FontSize="22" FontWeight="Bold"/>
+            <TextBlock Text="Stored optimization results"/>
+
+            <ItemsControl ItemsSource="{Binding Results}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Gray" BorderThickness="1" Padding="10" Margin="0,0,0,10">
+
+            <StackPanel Spacing="4">
+                <TextBlock Text="{Binding Minimalize, StringFormat='Minimalize: {0}'}"/>
+                <TextBlock Text="{Binding Season, StringFormat='Season: {0}'}"/>
+                <TextBlock Text="{Binding Scenario, StringFormat='Scenario: {0}'}"/>
+                <TextBlock Text="{Binding HeatProduction, StringFormat='Heat production: {0}'}"/>
+                <TextBlock Text="{Binding ElectricityProduction, StringFormat='Electricity production: {0}'}"/>
+                <TextBlock Text="{Binding ElectricityConsumption, StringFormat='Electricity consumption: {0}'}"/>
+                <TextBlock Text="{Binding Expenses, StringFormat='Expenses: {0}'}"/>
+                <TextBlock Text="{Binding Profit, StringFormat='Profit: {0}'}"/>
+                <TextBlock Text="{Binding PrimaryEnergyConsumption, StringFormat='Primary energy consumption: {0}'}"/>
+                <TextBlock Text="{Binding CO2Emissions, StringFormat='CO2 emissions: {0}'}"/>
+
+</StackPanel>
+</Border>
+</DataTemplate>
+</ItemsControl.ItemTemplate>
+</ItemsControl>
+</StackPanel>
+</ScrollViewer>
+</UserControl>

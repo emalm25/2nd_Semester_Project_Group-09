@@ -3,6 +3,7 @@
         xmlns:vm="using:HeatProductionOptimization.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="using:HeatProductionOptimization.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="HeatProductionOptimization.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -51,91 +52,9 @@
             <TextBlock Text="Welcome to our heat production optimizer!" Margin="10" FontSize="18" Foreground="White"/>
         </TabItem>
 
-        <TabItem Header="Asset manager">
-            <StackPanel>
-                <TextBlock Text="Asset manager information" Margin="10" FontSize="18" Foreground="White"/>
-                <ScrollViewer AllowAutoHide="True" HorizontalScrollBarVisibility="Visible" VerticalAlignment="Top" Padding="0">
-                    <ItemsControl ItemsSource="{Binding AssetManager.Units}" Margin="20,20,20,36">
-                        <!-- Define layout: horizontal with spacing -->
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal" Spacing="30"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        
-                        <!-- Define template for each unit -->
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:CompileBindings="False">
-                                <Border Background="#3f3f3f" BorderThickness="5" BorderBrush="#d94545" CornerRadius="5" Width="260" Height="480" Padding="15" VerticalAlignment="Top">
-                                    <StackPanel Spacing="12">
-                                        <!-- Image -->
-                                        <Border BorderThickness="10" CornerRadius="3" Background="#d94545" HorizontalAlignment="Center">
-                                            <Image Source="{Binding Image}" Width="150" Height="138" Stretch="Uniform"/>
-                                        </Border>
-                                        
-                                        <!-- Unit Header -->
-                                        <StackPanel Spacing="5">
-                                            <TextBlock Text="{Binding ShortName}" FontSize="20" FontWeight="Bold"/>
-                                            <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"/>
-                                        </StackPanel>
-                                        
-                                        <!-- Data Fields -->
-                                        <StackPanel Spacing="5">
-                                            <!-- Max Heat -->
-                                            <StackPanel>
-                                                <TextBlock Text="Max Heat" FontSize="12" FontWeight="SemiBold"/>
-                                                <TextBlock Text="{Binding MaxHeat}" FontSize="15" FontWeight="Bold"/>
-                                            </StackPanel>
-                                            
-                                            <!-- Max Electricity (if available) -->
-                                            <StackPanel IsVisible="{Binding MaxElectricity, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                                <TextBlock Text="Max Electricity" FontSize="12" FontWeight="SemiBold"/>
-                                                <TextBlock Text="{Binding MaxElectricity}" FontSize="15" FontWeight="Bold"/>
-                                            </StackPanel>
-                                            
-                                            <!-- CO2 Emissions -->
-                                            <StackPanel>
-                                                <TextBlock Text="CO₂ Emissions" FontSize="12" FontWeight="SemiBold"/>
-                                                <TextBlock FontSize="15" FontWeight="SemiBold">
-                                                    <TextBlock.Text>
-                                                        <MultiBinding StringFormat="{}{0}">
-                                                            <Binding Path="CO2Emissions" FallbackValue="N/A"/>
-                                                        </MultiBinding>
-                                                    </TextBlock.Text>
-                                                </TextBlock>
-                                            </StackPanel>
-                                            
-                                            <!-- Production Costs -->
-                                            <StackPanel>
-                                                <TextBlock Text="Production Costs" FontSize="12" FontWeight="SemiBold"/>
-                                                <TextBlock Text="{Binding ProductionCosts}" FontSize="15" FontWeight="SemiBold"/>
-                                            </StackPanel>
-                                            
-                                            <!-- Gas Consumption (if available) -->
-                                            <StackPanel IsVisible="{Binding GasConsumption, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                                <TextBlock Text="Gas Consumption" FontSize="12" FontWeight="SemiBold"/>
-                                                <TextBlock Text="{Binding GasConsumption}" FontSize="15" FontWeight="SemiBold"/>
-                                            </StackPanel>
-                                            
-                                            <!-- Oil Consumption (if available) -->
-                                            <StackPanel IsVisible="{Binding OilConsumption, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                                <TextBlock Text="Oil Consumption" FontSize="12" FontWeight="SemiBold"/>
-                                                <TextBlock Text="{Binding OilConsumption}" FontSize="15" FontWeight="SemiBold"/>
-                                            </StackPanel>
-                                            
-                                            <!-- Gas Motor Consumption (if available) -->
-                                            <StackPanel IsVisible="{Binding Gas2Consumption, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                                <TextBlock Text="Gas Consumption" FontSize="12" FontWeight="SemiBold"/>
-                                                <TextBlock Text="{Binding Gas2Consumption}" FontSize="15" FontWeight="SemiBold"/>
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
-            </StackPanel>
+        <TabItem Header="Asset Manager">
+            <!-- content for asset manager tab in seperate view -->
+            <views:AssetManagerView/>
         </TabItem>
 
         <TabItem Header="Source Data Manager">
@@ -147,7 +66,7 @@
         </TabItem>
 
         <TabItem Header="Optimizer">
-            <TextBlock Text="Optimize data here" Margin="10" FontSize="18" Foreground="White"/>
+            <views:OptimizerView/>
         </TabItem>
 
         <TabItem Header="Data Visualization">

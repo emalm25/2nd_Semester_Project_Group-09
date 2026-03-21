@@ -1,12 +1,14 @@
 ﻿namespace HeatProductionOptimization.ViewModels;
+using HeatProductionOptimization.Services;
 
 using CommunityToolkit.Mvvm.Input;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    public string Greeting { get; } = "Welcome to Avalonia!";
-
     public AssetManager AssetManager { get; } = new AssetManager();
+    private readonly ResultDataManager resultDataManager;
+    public ResultDataManagerViewModel ResultDataManagerVM { get; }
+
 
     private string selectedObjective = "Cost";
     private string selectedSeason = "Winter";
@@ -89,6 +91,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public MainWindowViewModel()
     {
+        resultDataManager = new ResultDataManager();
+        ResultDataManagerVM = new ResultDataManagerViewModel(resultDataManager);
+
         SetObjectiveCommand = new RelayCommand<string>(SetObjective);
         SetSeasonCommand = new RelayCommand<string>(SetSeason);
         SetScenarioCommand = new RelayCommand<string>(SetScenario);

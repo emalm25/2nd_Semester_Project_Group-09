@@ -1,16 +1,13 @@
-using System;
 using System.Collections.Generic;
-using HeatProductionOptimization.ViewModels;
-using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace AvaloniaApplication1.ViewModels;
+namespace HeatProductionOptimization.ViewModels;
 
 public class SourceDataViewModel : ViewModelBase
 {
-SourceManager manager;
+private readonly SourceManager manager;
 
 private List<Data> data;
-private string selectedPeriod;
+private string selectedPeriod = string.Empty;
 
 public List<string> Periods { get; } = new() { "Winter", "Summer" };
 
@@ -43,7 +40,7 @@ public string SelectedPeriod
     {
         manager = new SourceManager();
         data =  new List<Data>();
-        selectedPeriod = "Winter";
+        SelectedPeriod = Periods[0];
     }
 
 }

@@ -1,7 +1,7 @@
 <UserControl
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:vm="using:AvaloniaApplication1.ViewModels"
+    xmlns:vm="using:HeatProductionOptimization.ViewModels"
     x:Class="HeatProductionOptimization.Views.SourceDataView"
     x:DataType="vm:SourceDataViewModel">
 
@@ -10,7 +10,7 @@
         <ComboBox Grid.Row="0"
                   Margin="10"
                   ItemsSource="{Binding Periods}"
-                  SelectedItem="{Binding SelectedPeriod}" />
+                  SelectedItem="{Binding SelectedPeriod, Mode=TwoWay}" />
 
         <TextBlock Grid.Row="1"
                    Text="Heat Demand"

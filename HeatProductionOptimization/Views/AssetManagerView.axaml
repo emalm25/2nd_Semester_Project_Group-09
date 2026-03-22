@@ -5,23 +5,33 @@
     x:DataType="vm:MainWindowViewModel"
     x:Class="HeatProductionOptimization.Views.AssetManagerView">
 
-
-
     <StackPanel>
         <TextBlock Text="Asset manager information" Margin="10" FontSize="18" Foreground="White"/>
-        <ScrollViewer AllowAutoHide="True" HorizontalScrollBarVisibility="Visible" VerticalAlignment="Top" Padding="0">
+        <ScrollViewer Classes="asset-scroll" AllowAutoHide="True" HorizontalScrollBarVisibility="Visible" VerticalAlignment="Top" Padding="0">
+            <!-- Custom styles for the scrollbar -->
+            <ScrollViewer.Styles>
+                <Style Selector="ScrollViewer.asset-scroll ScrollBar /template/ Thumb">
+                    <Setter Property="Background" Value="#d94545"/>
+                </Style>
+
+                <Style Selector="ScrollViewer.asset-scroll ScrollBar /template/ Rectangle#TrackRect">
+                    <Setter Property="Fill" Value="#2E2E2E"/>
+                    <Setter Property="Opacity" Value="0"/>
+                </Style>
+            </ScrollViewer.Styles>
+
             <ItemsControl ItemsSource="{Binding AssetManager.Units}" Margin="20,20,20,36">
                 <!-- Define layout: horizontal with spacing -->
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal" Spacing="30"/>
+                        <StackPanel Orientation="Horizontal" Spacing="20"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 
                 <!-- Define template for each unit -->
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:CompileBindings="False">
-                        <Border Background="#3f3f3f" BorderThickness="5" BorderBrush="#d94545" CornerRadius="5" Width="260" Height="480" Padding="15" VerticalAlignment="Top">
+                        <Border Background="#2E2E2E" BorderThickness="2" BorderBrush="#d94545" CornerRadius="5" Width="260" Height="500" Padding="15" VerticalAlignment="Top">
                             <StackPanel Spacing="12">
                                 <!-- Image -->
                                 <Border BorderThickness="10" CornerRadius="3" Background="#d94545" HorizontalAlignment="Center">
@@ -35,53 +45,47 @@
                                 </StackPanel>
                                 
                                 <!-- Data Fields -->
-                                <StackPanel Spacing="5">
+                                <StackPanel Spacing="10">
                                     <!-- Max Heat -->
                                     <StackPanel>
-                                        <TextBlock Text="Max Heat" FontSize="12" FontWeight="SemiBold"/>
-                                        <TextBlock Text="{Binding MaxHeat}" FontSize="15" FontWeight="Bold"/>
+                                        <TextBlock Text="Max Heat:" FontSize="12" Padding="0,0,0,3"/>
+                                        <TextBlock Text="{Binding MaxHeat, StringFormat={}{0:F1} MW}" FontSize="15" FontWeight="SemiBold"/>
                                     </StackPanel>
                                     
                                     <!-- Max Electricity (if available) -->
                                     <StackPanel IsVisible="{Binding MaxElectricity, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                        <TextBlock Text="Max Electricity" FontSize="12" FontWeight="SemiBold"/>
-                                        <TextBlock Text="{Binding MaxElectricity}" FontSize="15" FontWeight="Bold"/>
-                                    </StackPanel>
-                                    
-                                    <!-- CO2 Emissions -->
-                                    <StackPanel>
-                                        <TextBlock Text="CO₂ Emissions" FontSize="12" FontWeight="SemiBold"/>
-                                        <TextBlock FontSize="15" FontWeight="SemiBold">
-                                            <TextBlock.Text>
-                                                <MultiBinding StringFormat="{}{0}">
-                                                    <Binding Path="CO2Emissions" FallbackValue="N/A"/>
-                                                </MultiBinding>
-                                            </TextBlock.Text>
-                                        </TextBlock>
+                                        <TextBlock Text="Max Electricity:" FontSize="12" Padding="0,0,0,3"/>
+                                        <TextBlock Text="{Binding MaxElectricity, StringFormat={}{0:F1} MW}" FontSize="15" FontWeight="SemiBold"/>
                                     </StackPanel>
                                     
                                     <!-- Production Costs -->
                                     <StackPanel>
-                                        <TextBlock Text="Production Costs" FontSize="12" FontWeight="SemiBold"/>
-                                        <TextBlock Text="{Binding ProductionCosts}" FontSize="15" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Production Costs:" FontSize="12" Padding="0,0,0,3"/>
+                                        <TextBlock Text="{Binding ProductionCosts, StringFormat={}{0} DKK / MWh(th)}" FontSize="15" FontWeight="SemiBold"/>
+                                    </StackPanel>
+
+                                    <!-- CO2 Emissions -->
+                                    <StackPanel>
+                                        <TextBlock Text="CO₂ Emissions:" FontSize="12" Padding="0,0,0,3"/>
+                                        <TextBlock Text="{Binding CO2Emissions, StringFormat={}{0:F1} kg / MWh(th), TargetNullValue=None}" FontSize="15" FontWeight="SemiBold"/>
                                     </StackPanel>
                                     
                                     <!-- Gas Consumption (if available) -->
                                     <StackPanel IsVisible="{Binding GasConsumption, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                        <TextBlock Text="Gas Consumption" FontSize="12" FontWeight="SemiBold"/>
-                                        <TextBlock Text="{Binding GasConsumption}" FontSize="15" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Gas Consumption:" FontSize="12" Padding="0,0,0,3"/>
+                                        <TextBlock Text="{Binding GasConsumption, StringFormat={}{0:F2} MWh(gas) / MWh(th)}" FontSize="15" FontWeight="SemiBold"/>
                                     </StackPanel>
                                     
                                     <!-- Oil Consumption (if available) -->
                                     <StackPanel IsVisible="{Binding OilConsumption, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                        <TextBlock Text="Oil Consumption" FontSize="12" FontWeight="SemiBold"/>
-                                        <TextBlock Text="{Binding OilConsumption}" FontSize="15" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Oil Consumption:" FontSize="12" Padding="0,0,0,3"/>
+                                        <TextBlock Text="{Binding OilConsumption, StringFormat={}{0:F2} MWh(oil) / MWh(th)}" FontSize="15" FontWeight="SemiBold"/>
                                     </StackPanel>
                                     
                                     <!-- Gas Motor Consumption (if available) -->
                                     <StackPanel IsVisible="{Binding Gas2Consumption, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                        <TextBlock Text="Gas Consumption" FontSize="12" FontWeight="SemiBold"/>
-                                        <TextBlock Text="{Binding Gas2Consumption}" FontSize="15" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Gas Consumption:" FontSize="12" Padding="0,0,0,3"/>
+                                        <TextBlock Text="{Binding Gas2Consumption, StringFormat={}{0:F2} MWh(gas) / MWh(th)}" FontSize="15" FontWeight="SemiBold"/>
                                     </StackPanel>
                                 </StackPanel>
                             </StackPanel>

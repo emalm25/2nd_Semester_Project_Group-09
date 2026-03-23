@@ -7,15 +7,19 @@
 
     <ScrollViewer>
         <StackPanel Margin="20" Spacing="10">
-            <TextBlock Text="Result Data Manager" FontSize="22" FontWeight="Bold"/>
-            <TextBlock Text="Stored optimization results"/>
-
-            <ItemsControl ItemsSource="{Binding Results}">
-                <ItemsControl.ItemTemplate>
+            <TextBlock Text="Result Manager" FontSize="22" FontWeight="Bold" />
+            <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button Content="Save" Command="{Binding SaveCommand}" />
+            <Button Content="Load" Command="{Binding LoadCommand}" />
+            <Button Content="Remove selected" Command="{Binding RemoveSelectedCommand}"/>
+            <Button Content="Clear all" Command="{Binding ClearAllCommand}"/>
+        </StackPanel>  
+        <TextBlock Text="{Binding StatusMessage}" />
+            <ListBox ItemsSource="{Binding Results}" SelectedItem="{Binding SelectedResult}">
+                <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border BorderBrush="Gray" BorderThickness="1" Padding="10" Margin="0,0,0,10">
-
-            <StackPanel Spacing="4">
+                <StackPanel Spacing="4">
                 <TextBlock Text="{Binding Minimalize, StringFormat='Minimalize: {0}'}"/>
                 <TextBlock Text="{Binding Season, StringFormat='Season: {0}'}"/>
                 <TextBlock Text="{Binding Scenario, StringFormat='Scenario: {0}'}"/>
@@ -30,8 +34,8 @@
 </StackPanel>
 </Border>
 </DataTemplate>
-</ItemsControl.ItemTemplate>
-</ItemsControl>
+</ListBox.ItemTemplate>
+</ListBox>
 </StackPanel>
 </ScrollViewer>
 </UserControl>

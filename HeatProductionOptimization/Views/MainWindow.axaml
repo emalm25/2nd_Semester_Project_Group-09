@@ -58,7 +58,7 @@
         </TabItem>
 
         <TabItem Header="Source Data Manager">
-            <TextBlock Text="Source data manager information" Margin="10" FontSize="18" Foreground="White"/>
+            <views:SourceDataView/>
         </TabItem>
 
         <TabItem Header="Result Data Manager">

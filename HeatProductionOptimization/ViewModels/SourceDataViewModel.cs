@@ -7,7 +7,15 @@ public class SourceDataViewModel : ViewModelBase
 private readonly SourceManager manager;
 
 private List<Data> data;
+<<<<<<< Updated upstream
 private string selectedPeriod = string.Empty;
+=======
+<<<<<<< Updated upstream
+private string selectedPeriod;
+=======
+private string selectedPeriod = "Winter";
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
 public List<string> Periods { get; } = new() { "Winter", "Summer" };
 

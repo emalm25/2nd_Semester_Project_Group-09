@@ -27,12 +27,14 @@ public class Data
     {
         public List<Data> GetWinterData()
         {
-            return Csvreader.CSVReadHandle("SourceWinterData.csv");
+            var winterPath = Path.Combine(AppContext.BaseDirectory, "SourceWinterData.csv");
+            return Csvreader.CSVReadHandle(winterPath);
         }
 
         public List<Data> GetSummerData()
         {
-            return Csvreader.CSVReadHandle("SourceSummerData.csv");
+            var summerPath = Path.Combine(AppContext.BaseDirectory, "SourceSummerData.csv");
+            return Csvreader.CSVReadHandle(summerPath);
         }
         
     }

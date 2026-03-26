@@ -54,7 +54,7 @@
 
         <TabItem Header="Asset Manager">
             <!-- content for asset manager tab in seperate view -->
-            <views:AssetManagerView/>
+            <views:AssetManagerView DataContext="{Binding AssetManagerViewModel}"/>
         </TabItem>
 
         <TabItem Header="Source Data Manager">

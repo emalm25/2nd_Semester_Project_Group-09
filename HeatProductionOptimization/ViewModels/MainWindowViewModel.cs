@@ -5,7 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    public AssetManager AssetManager { get; } = new AssetManager();
+    public AssetManagerViewModel AssetManagerViewModel { get; }
     private readonly ResultDataManager resultDataManager;
     public ResultDataManagerViewModel ResultDataManagerVM { get; }
 
@@ -91,6 +91,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public MainWindowViewModel()
     {
+        AssetManagerViewModel = new AssetManagerViewModel();
         resultDataManager = new ResultDataManager();
         ResultDataManagerVM = new ResultDataManagerViewModel(resultDataManager);
 

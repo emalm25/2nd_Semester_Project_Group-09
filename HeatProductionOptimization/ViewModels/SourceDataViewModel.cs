@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace HeatProductionOptimization.ViewModels;
 
@@ -7,7 +7,7 @@ public class SourceDataViewModel : ViewModelBase
 private readonly SourceManager manager;
 
 private List<Data> data;
-private string selectedPeriod = string.Empty;
+private string selectedPeriod = "Winter";
 
 public List<string> Periods { get; } = new() { "Winter", "Summer" };
 
@@ -44,4 +44,3 @@ public string SelectedPeriod
     }
 
 }
-

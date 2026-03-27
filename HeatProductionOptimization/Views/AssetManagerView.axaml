@@ -2,7 +2,7 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:HeatProductionOptimization.ViewModels"
-    x:DataType="vm:MainWindowViewModel"
+    x:DataType="vm:AssetManagerViewModel"
     x:Class="HeatProductionOptimization.Views.AssetManagerView">
 
     <StackPanel>
@@ -20,7 +20,7 @@
                 </Style>
             </ScrollViewer.Styles>
 
-            <ItemsControl ItemsSource="{Binding AssetManager.Units}" Margin="20,20,20,36">
+            <ItemsControl ItemsSource="{Binding Units}" Margin="20,20,20,36">
                 <!-- Define layout: horizontal with spacing -->
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -31,7 +31,7 @@
                 <!-- Define template for each unit -->
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:CompileBindings="False">
-                        <Border Background="#2E2E2E" BorderThickness="2" BorderBrush="#d94545" CornerRadius="5" Width="260" Height="500" Padding="15" VerticalAlignment="Top">
+                        <Border Background="#2E2E2E" BorderThickness="2" BorderBrush="#d94545" CornerRadius="5" Height="520" Width="260" Padding="15" VerticalAlignment="Top">
                             <StackPanel Spacing="12">
                                 <!-- Image -->
                                 <Border BorderThickness="10" CornerRadius="3" Background="#d94545" HorizontalAlignment="Center">
@@ -40,6 +40,7 @@
                                 
                                 <!-- Unit Header -->
                                 <StackPanel Spacing="5">
+                                    <TextBlock Text="{Binding Status}" Foreground="{Binding StatusColor}" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold"/>
                                     <TextBlock Text="{Binding ShortName}" FontSize="20" FontWeight="Bold"/>
                                     <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"/>
                                 </StackPanel>
@@ -67,7 +68,7 @@
                                     <!-- CO2 Emissions -->
                                     <StackPanel>
                                         <TextBlock Text="CO₂ Emissions:" FontSize="12" Padding="0,0,0,3"/>
-                                        <TextBlock Text="{Binding CO2Emissions, StringFormat={}{0:F1} kg / MWh(th), TargetNullValue=None}" FontSize="15" FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding CO2Emissions, StringFormat={}{0} kg / MWh(th), TargetNullValue=None}" FontSize="15" FontWeight="SemiBold"/>
                                     </StackPanel>
                                     
                                     <!-- Gas Consumption (if available) -->

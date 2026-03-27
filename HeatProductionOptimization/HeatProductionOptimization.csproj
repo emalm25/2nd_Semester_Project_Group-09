@@ -10,6 +10,14 @@
   <ItemGroup>
     <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
+    <None Include="Services\SourceWinterData.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>SourceWinterData.csv</TargetPath>
+    </None>
+    <None Include="Services\SourceSummerData.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>SourceSummerData.csv</TargetPath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

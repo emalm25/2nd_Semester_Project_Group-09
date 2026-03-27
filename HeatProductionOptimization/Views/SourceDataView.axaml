@@ -5,12 +5,56 @@
     x:Class="HeatProductionOptimization.Views.SourceDataView"
     x:DataType="vm:SourceDataViewModel">
 
+
+   <UserControl.Styles>
+    <Styles>
+
+        <Style Selector="ComboBox">
+            <Setter Property="Background" Value="#d94545"/>
+            <Setter Property="BorderBrush" Value="Black"/>
+        </Style>
+
+
+        <Style Selector="ComboBoxItem">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#3f3f3f"/>
+        </Style>
+
+       
+        <Style Selector="ComboBoxItem:pointerover">
+            <Setter Property="Background" Value="#555555"/>
+        </Style>
+
+    
+        <Style Selector="ComboBoxItem:selected">
+            <Setter Property="Background" Value="#d94545"/>
+        </Style>
+
+    </Styles>
+</UserControl.Styles>
+
     <Grid RowDefinitions="Auto,Auto,*,Auto,*">
 
-        <ComboBox Grid.Row="0"
-                  Margin="10"
-                  ItemsSource="{Binding Periods}"
-                  SelectedItem="{Binding SelectedPeriod, Mode=TwoWay}" />
+       <ComboBox Grid.Row="0"
+          Margin="10"
+          Width="150"
+             ItemsSource="{Binding Periods}"
+             SelectedItem="{Binding SelectedPeriod, Mode=TwoWay}"
+          HorizontalContentAlignment="Center">
+
+    <ComboBox.SelectionBoxItemTemplate>
+        <DataTemplate>
+            <TextBlock Text="{Binding}" Foreground="White"/>
+        </DataTemplate>
+    </ComboBox.SelectionBoxItemTemplate>
+
+    <ComboBox.ItemTemplate>
+        <DataTemplate>
+            <TextBlock Text="{Binding}" Foreground="White"/>
+        </DataTemplate>
+    </ComboBox.ItemTemplate>
+
+    </ComboBox>
 
         <TextBlock Grid.Row="1"
                    Text="Heat Demand"

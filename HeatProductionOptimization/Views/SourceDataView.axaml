@@ -74,12 +74,17 @@
                        FontSize="12"/>
         </StackPanel>
 
-        <lvc:CartesianChart Grid.Row="3"
-                            Margin="10"
-                            Series="{Binding HeatDemandSeries}"
-                            XAxes="{Binding TimeAxes}"
-                            YAxes="{Binding HeatDemandYAxes}"
-                            Background="White"/>
+        <Border Grid.Row="3"
+            Margin="10"
+            BorderThickness="2"
+            BorderBrush="#d94545"
+            CornerRadius="5"
+            Background="White">
+            <lvc:CartesianChart Series="{Binding HeatDemandSeries}"
+                    XAxes="{Binding TimeAxes}"
+                    YAxes="{Binding HeatDemandYAxes}"
+                    Background="White"/>
+        </Border>
 
         <TextBlock Grid.Row="4"
                    Text="Electricity Prices"
@@ -104,12 +109,17 @@
                        FontSize="12"/>
         </StackPanel>
 
-        <lvc:CartesianChart Grid.Row="6"
-                            Margin="10"
-                            Series="{Binding ElectricityPriceSeries}"
-                            XAxes="{Binding TimeAxes}"
-                            YAxes="{Binding ElectricityPriceYAxes}"
-                            Background="White"/>
+        <Border Grid.Row="6"
+            Margin="10"
+            BorderThickness="2"
+            BorderBrush="#d94545"
+            CornerRadius="5"
+            Background="White">
+            <lvc:CartesianChart Series="{Binding ElectricityPriceSeries}"
+                    XAxes="{Binding TimeAxes}"
+                    YAxes="{Binding ElectricityPriceYAxes}"
+                    Background="White"/>
+        </Border>
 
     </Grid>
 

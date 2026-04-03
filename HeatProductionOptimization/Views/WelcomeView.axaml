@@ -1,0 +1,29 @@
+<UserControl 
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="HeatProductionOptimization.Views.WelcomeView">
+
+    <StackPanel>
+        <TextBlock Text="Welcome to our heat production optimizer!" Margin="18" FontSize="22" FontWeight="SemiBold"/>
+        <TextBlock Text="" Margin="10" FontSize="18" LineHeight="30" TextWrapping="Wrap" HorizontalAlignment="Center">
+        This application is designed to help you optimize your heat production by providing insights into your assets and data, allowing you to manage them effectively. 
+        <LineBreak/>
+        Navigate through tabs to explore different managers.
+        </TextBlock>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10" Spacing="50">
+            <Border BorderThickness="2" CornerRadius="3" Background="#2E2E2E" Padding="10">
+            <StackPanel Spacing="25" VerticalAlignment="Center" Margin="10">
+            <TextBlock Text="District Heating Grid" FontSize="20" FontWeight="SemiBold"/>
+            <TextBlock Text="• Architecture: single district heating network, two heat producers." FontSize="16"/>
+            <TextBlock Text="• Size: 1600 buildings." FontSize="16"/>
+            <TextBlock Text="• City: Heatington." FontSize="16"/>
+            </StackPanel>
+            </Border>
+
+            <Border BorderThickness="2" CornerRadius="3" Background="#d94545" HorizontalAlignment="Center">
+            <Image Source="avares://HeatProductionOptimization/Assets/Heating%20grid.png" Height="450" Stretch="Uniform" Margin="10"/>
+            </Border>
+
+        </StackPanel>
+    </StackPanel>
+</UserControl>

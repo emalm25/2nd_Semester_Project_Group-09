@@ -49,7 +49,7 @@
     <TabControl>
 
         <TabItem Header="Welcome" IsSelected="True">
-            <TextBlock Text="Welcome to our heat production optimizer!" Margin="10" FontSize="18" Foreground="White"/>
+            <views:WelcomeView/>
         </TabItem>
 
         <TabItem Header="Asset Manager">

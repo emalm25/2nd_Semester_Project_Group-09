@@ -149,7 +149,7 @@ public class SourceDataViewModel : ViewModelBase
         var priceValues = Data.Select(d => d.ElectricityPrice).ToArray();
         var labels = Data.Select(d => d.StartTime.ToString("dd/MM HH:mm")).ToArray();
 
-        // Determinar colores según el período
+        // Determine colors based on the selected period
         SKColor heatColor = selectedPeriod == Periods[0] 
             ? SKColors.RoyalBlue      // Winter: Azul
             : SKColors.OrangeRed;     // Summer: Naranjado

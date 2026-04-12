@@ -7,13 +7,19 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly ResultDataManager resultDataManager;
     public ResultDataManagerViewModel ResultDataManagerVM { get; }
     public OptimizerViewModel OptimizerVM { get; }
+    private readonly AssetManager assetManager;
 
     public MainWindowViewModel()
     {
-        AssetManagerViewModel = new AssetManagerViewModel();
+        assetManager = new AssetManager();
+        AssetManagerViewModel = new AssetManagerViewModel(assetManager);
         resultDataManager = new ResultDataManager();
         ResultDataManagerVM = new ResultDataManagerViewModel(resultDataManager);
-        OptimizerVM = new OptimizerViewModel(new OptimizerService(), resultDataManager);
+        OptimizerVM = new OptimizerViewModel(
+            new OptimizerService(assetManager),
+            resultDataManager,
+            ResultDataManagerVM,
+            AssetManagerViewModel);
     }
 
 }

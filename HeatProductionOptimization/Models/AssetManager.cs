@@ -107,8 +107,8 @@ public class AssetManager
         new GasBoilersInfo("GB2", "Gas Boiler 2", true, 2.0 , 540, 134, 1.08),
         new GasBoilersInfo("GB3", "Gas Boiler 3", true, 4.0 , 580, 136, 1.09),
         new OilBoilerInfo("OB1", "Oil Boiler 1", true, 6.0, 690, 147, 1.18),
-        new GasMotorInfo("GM1", "Gas Motor 1", false, 5.3, 3.9, 975, 227, 1.82),
-        new ElectricBoilerInfo("EB1", "Electric Boiler 1", false, 6.0, -6.0, 15)
+        new GasMotorInfo("GM1", "Gas Motor 1", true, 5.3, 3.9, 975, 227, 1.82),
+        new ElectricBoilerInfo("EB1", "Electric Boiler 1", true, 6.0, -6.0, 15)
     };
 }
 

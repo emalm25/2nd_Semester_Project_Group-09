@@ -67,6 +67,7 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
 
         resultDataManagerViewModel.PropertyChanged += OnResultDataManagerPropertyChanged;
         resultDataManagerViewModel.Results.CollectionChanged += OnResultsCollectionChanged;
+        SubscribeToAssetAvailabilityChanges();
 
         BuildProductionUnitSettings();
         SelectedResult = resultDataManagerViewModel.SelectedResult ?? resultDataManagerViewModel.Results.LastOrDefault();
@@ -554,8 +555,36 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
         return costPerMWh - electricityRevenuePerMWhHeat + electricityCostPerMWhHeat;
     }
 
+    private void SubscribeToAssetAvailabilityChanges()
+    {
+        foreach (var unit in assetManagerViewModel.Units)
+        {
+            unit.PropertyChanged += OnAssetUnitPropertyChanged;
+        }
+    }
+
+    private void UnsubscribeFromAssetAvailabilityChanges()
+    {
+        foreach (var unit in assetManagerViewModel.Units)
+        {
+            unit.PropertyChanged -= OnAssetUnitPropertyChanged;
+        }
+    }
+
+    private void OnAssetUnitPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(ProductionUnitItemViewModel.IsAvailable))
+        {
+            return;
+        }
+
+        BuildProductionUnitSettings();
+        BuildNetProductionCostChart();
+    }
+
     public void Dispose()
     {
+        UnsubscribeFromAssetAvailabilityChanges();
         resultDataManagerViewModel.PropertyChanged -= OnResultDataManagerPropertyChanged;
         resultDataManagerViewModel.Results.CollectionChanged -= OnResultsCollectionChanged;
     }

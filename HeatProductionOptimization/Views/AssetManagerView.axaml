@@ -40,9 +40,23 @@
                                 
                                 <!-- Unit Header -->
                                 <StackPanel Spacing="5">
-                                    <TextBlock Text="{Binding Status}" Foreground="{Binding StatusColor}" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold"/>
-                                    <TextBlock Text="{Binding ShortName}" FontSize="20" FontWeight="Bold"/>
-                                    <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"/>
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <TextBlock Text="{Binding ShortName}" FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
+                                    <ToggleSwitch IsChecked="{Binding IsAvailable}" OnContent="" OffContent="">
+                                        <!-- Custom styles for the switch -->
+                                        <ToggleSwitch.Styles>
+                                            <Style Selector="ToggleSwitch:checked /template/ Border#SwitchKnobBounds">
+                                                <Setter Property="Background" Value="#d94545"/>
+                                            </Style>
+                                            <Style Selector="ToggleSwitch:unchecked /template/ Border#OuterBorder">
+                                                <Setter Property="Background" Value="#252525"/>
+                                                <Setter Property="BorderBrush" Value="#252525"/>
+                                            </Style>
+                                        </ToggleSwitch.Styles>
+                                    </ToggleSwitch>
+                                    </StackPanel>
+
+                                    <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold"/>
                                 </StackPanel>
                                 
                                 <!-- Data Fields -->

@@ -18,7 +18,7 @@ public class ProductionUnit
 {
     public string ShortName {get; private set;}
     public string Name {get; private set;}
-    public bool IsActive {get; set;}
+    public bool IsAvailable {get; set;}
     public double MaxHeat {get; private set;}
     public decimal ProductionCosts {get; private set;}
     public double? CO2Emissions {get; private set;}
@@ -31,11 +31,11 @@ public class ProductionUnit
     public virtual string ImagePath => "avares://HeatProductionOptimization/Assets/ProductionUnits/no-image.png";
     public Bitmap Image => new Bitmap(AssetLoader.Open(new Uri(ImagePath)));
 
-    public ProductionUnit(string ShortName, string Name, bool IsActive, double MaxHeat, decimal ProductionCosts,double? CO2Emissions )
+    public ProductionUnit(string ShortName, string Name, bool IsAvailable, double MaxHeat, decimal ProductionCosts,double? CO2Emissions )
     {
         this.ShortName = ShortName;
         this.Name = Name;
-        this.IsActive = IsActive;
+        this.IsAvailable = IsAvailable;
         this.MaxHeat = MaxHeat;
         this.ProductionCosts = ProductionCosts;
         this.CO2Emissions = CO2Emissions;
@@ -48,8 +48,8 @@ public class GasBoilersInfo : ProductionUnit
     public override double? GasConsumption => _gasConsumption;
     public override string ImagePath => "avares://HeatProductionOptimization/Assets/ProductionUnits/gas-boiler-image.png";
 
-    public GasBoilersInfo(string ShortName, string Name, bool IsActive, double MaxHeat, decimal ProductionCosts, double CO2Emissions, double GasConsumption)
-    : base(ShortName, Name, IsActive, MaxHeat, ProductionCosts, CO2Emissions)
+    public GasBoilersInfo(string ShortName, string Name, bool IsAvailable, double MaxHeat, decimal ProductionCosts, double CO2Emissions, double GasConsumption)
+    : base(ShortName, Name, IsAvailable, MaxHeat, ProductionCosts, CO2Emissions)
     {
         _gasConsumption = GasConsumption;
     }
@@ -61,8 +61,8 @@ public class OilBoilerInfo : ProductionUnit
     public override double? OilConsumption => _oilConsumption;
     public override string ImagePath => "avares://HeatProductionOptimization/Assets/ProductionUnits/oil-boiler-image.png";
 
-    public OilBoilerInfo(string ShortName, string Name, bool IsActive, double MaxHeat, decimal ProductionCosts, double CO2Emissions, double OilConsumption)
-    : base(ShortName, Name, IsActive, MaxHeat, ProductionCosts, CO2Emissions)
+    public OilBoilerInfo(string ShortName, string Name, bool IsAvailable, double MaxHeat, decimal ProductionCosts, double CO2Emissions, double OilConsumption)
+    : base(ShortName, Name, IsAvailable, MaxHeat, ProductionCosts, CO2Emissions)
     {
         _oilConsumption = OilConsumption;
     }
@@ -77,8 +77,8 @@ public class GasMotorInfo : ProductionUnit
     public override double? MaxElectricity => _maxElectricity;
     public override string ImagePath => "avares://HeatProductionOptimization/Assets/ProductionUnits/gas-motor-image.png";
 
-    public GasMotorInfo(string ShortName, string Name, bool IsActive, double MaxHeat, double MaxElectricity, decimal ProductionCosts, double CO2Emissions, double Gas2Consumption)
-    : base(ShortName, Name, IsActive, MaxHeat, ProductionCosts, CO2Emissions)
+    public GasMotorInfo(string ShortName, string Name, bool IsAvailable, double MaxHeat, double MaxElectricity, decimal ProductionCosts, double CO2Emissions, double Gas2Consumption)
+    : base(ShortName, Name, IsAvailable, MaxHeat, ProductionCosts, CO2Emissions)
     {
         _gas2Consumption = Gas2Consumption;
         _maxElectricity = MaxElectricity;
@@ -91,8 +91,8 @@ public class ElectricBoilerInfo : ProductionUnit
     public override double? MaxElectricity => _maxElectricity;
     public override string ImagePath => "avares://HeatProductionOptimization/Assets/ProductionUnits/electric-boiler-image.png";
     
-    public ElectricBoilerInfo(string ShortName, string Name, bool IsActive, double MaxHeat, double MaxElectricity, decimal ProductionCost )
-    : base(ShortName, Name, IsActive, MaxHeat, ProductionCost, null)
+    public ElectricBoilerInfo(string ShortName, string Name, bool IsAvailable, double MaxHeat, double MaxElectricity, decimal ProductionCost )
+    : base(ShortName, Name, IsAvailable, MaxHeat, ProductionCost, null)
     {
         _maxElectricity = MaxElectricity;
     }

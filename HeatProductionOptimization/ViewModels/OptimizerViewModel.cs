@@ -277,12 +277,12 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
             {
                 ShortName = unit.ShortName,
                 Name = unit.Name,
-                IsActive = unit.IsActive,
+                IsActive = unit.IsAvailable,
                 MaxHeat = unit.MaxHeat,
                 CostPerMWh = (double)unit.ProductionCosts,
                 Co2PerMWh = unit.CO2Emissions ?? 0,
                 ElectricityPerHeatMWh = GetElectricityPerHeat(unit),
-                StatusBrush = unit.IsActive ? Brushes.LimeGreen : Brushes.Gray
+                StatusBrush = unit.IsAvailable ? Brushes.LimeGreen : Brushes.Gray
             });
         }
     }
@@ -468,7 +468,7 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
             .ToArray();
         var priceValues = points.Select(point => point.ElectricityPrice).ToArray();
 
-        var activeUnits = assetManagerViewModel.Units.Where(unit => unit.IsActive).ToList();
+        var availableUnits = assetManagerViewModel.Units.Where(unit => unit.IsAvailable).ToList();
         var series = new List<ISeries>
         {
             new LineSeries<double>
@@ -481,7 +481,7 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
             }
         };
 
-        foreach (var unit in activeUnits)
+        foreach (var unit in availableUnits)
         {
             var electricityPerHeat = GetElectricityPerHeat(unit);
             var unitValues = points

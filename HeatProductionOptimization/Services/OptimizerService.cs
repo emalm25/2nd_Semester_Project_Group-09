@@ -38,7 +38,7 @@ public class OptimizerService
                 MaxHeatMW = unit.MaxHeat,
                 ElectricityPerHeatMWh = GetElectricityPerHeat(unit)
             })
-            .Where(unit => unit.Unit.IsActive && !unit.IsInMaintenance)
+            .Where(unit => unit.Unit.IsAvailable && !unit.IsInMaintenance)
             .ToList();
 
         var result = new OptimizationResult

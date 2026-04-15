@@ -2,6 +2,7 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:vm="using:HeatProductionOptimization.ViewModels"
+		xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
 	x:Class="HeatProductionOptimization.Views.OptimizerView"
 	x:DataType="vm:OptimizerViewModel">
 
@@ -27,34 +28,73 @@
 				<Setter Property="BorderThickness" Value="0"/>
 				<Setter Property="MinWidth" Value="180"/>
 			</Style>
+			<Style Selector="Border.panel">
+				<Setter Property="Background" Value="#2A2A2A"/>
+				<Setter Property="BorderBrush" Value="#3E3E3E"/>
+				<Setter Property="BorderThickness" Value="1"/>
+				<Setter Property="CornerRadius" Value="8"/>
+				<Setter Property="Padding" Value="14"/>
+			</Style>
+			<Style Selector="TextBlock.sectionTitle">
+				<Setter Property="FontSize" Value="18"/>
+				<Setter Property="FontWeight" Value="SemiBold"/>
+				<Setter Property="Foreground" Value="White"/>
+			</Style>
+			<Style Selector="Border.metricCard">
+				<Setter Property="Background" Value="#262626"/>
+				<Setter Property="BorderBrush" Value="#404040"/>
+				<Setter Property="BorderThickness" Value="1"/>
+				<Setter Property="CornerRadius" Value="6"/>
+				<Setter Property="Padding" Value="10"/>
+				<Setter Property="Width" Value="170"/>
+			</Style>
+			<Style Selector="Border.barCell">
+				<Setter Property="Width" Value="48"/>
+				<Setter Property="HorizontalAlignment" Value="Center"/>
+			</Style>
+			<!-- Custom scrollbar styles -->
+			<Style Selector="ScrollViewer.optimizer-scroll ScrollBar /template/ Thumb">
+				<Setter Property="Background" Value="#d94545"/>
+			</Style>
+			<Style Selector="ScrollViewer.optimizer-scroll ScrollBar /template/ Rectangle#TrackRect">
+				<Setter Property="Fill" Value="#2E2E2E"/>
+				<Setter Property="Opacity" Value="0"/>
+			</Style>
 		</Styles>
 	</UserControl.Styles>
 
-	<ScrollViewer>
+	<ScrollViewer Classes="optimizer-scroll" VerticalScrollBarVisibility="Auto">
 		<StackPanel Margin="18" Spacing="14">
+			<!-- Optimization Controls Section -->
 			<TextBlock Text="Optimization Criteria" FontSize="22" FontWeight="SemiBold" Foreground="White"/>
 			<TextBlock Text="Select one option in each category, then run the optimizer." Foreground="#D0D0D0"/>
 
 			<Border Background="#2E2E2E" CornerRadius="8" Padding="14" BorderBrush="#3D3D3D" BorderThickness="1">
-				<StackPanel Spacing="12">
-					<TextBlock Text="Objective" FontSize="16" FontWeight="SemiBold"/>
-					<StackPanel Orientation="Horizontal" Spacing="10">
-						<Button Content="Cost" Classes="option" Classes.selected="{Binding IsCostSelected}" Command="{Binding SetObjectiveCommand}" CommandParameter="Cost"/>
-						<Button Content="CO2" Classes="option" Classes.selected="{Binding IsCo2Selected}" Command="{Binding SetObjectiveCommand}" CommandParameter="CO2"/>
+				<WrapPanel Orientation="Horizontal" ItemHeight="90" ItemWidth="320">
+					<StackPanel Spacing="8" Margin="0,0,16,0">
+						<TextBlock Text="Objective" FontSize="16" FontWeight="SemiBold"/>
+						<StackPanel Orientation="Horizontal" Spacing="10">
+							<Button Content="Cost" Classes="option" Classes.selected="{Binding IsCostSelected}" Command="{Binding SetObjectiveCommand}" CommandParameter="Cost"/>
+							<Button Content="CO2" Classes="option" Classes.selected="{Binding IsCo2Selected}" Command="{Binding SetObjectiveCommand}" CommandParameter="CO2"/>
+						</StackPanel>
 					</StackPanel>
 
-					<TextBlock Text="Season" FontSize="16" FontWeight="SemiBold" Margin="0,6,0,0"/>
-					<StackPanel Orientation="Horizontal" Spacing="10">
-						<Button Content="Winter" Classes="option" Classes.selected="{Binding IsWinterSelected}" Command="{Binding SetSeasonCommand}" CommandParameter="Winter"/>
-						<Button Content="Summer" Classes="option" Classes.selected="{Binding IsSummerSelected}" Command="{Binding SetSeasonCommand}" CommandParameter="Summer"/>
+					<StackPanel Spacing="8" Margin="0,0,16,0">
+						<TextBlock Text="Season" FontSize="16" FontWeight="SemiBold"/>
+						<StackPanel Orientation="Horizontal" Spacing="10">
+							<Button Content="Winter" Classes="option" Classes.selected="{Binding IsWinterSelected}" Command="{Binding SetSeasonCommand}" CommandParameter="Winter"/>
+							<Button Content="Summer" Classes="option" Classes.selected="{Binding IsSummerSelected}" Command="{Binding SetSeasonCommand}" CommandParameter="Summer"/>
+						</StackPanel>
 					</StackPanel>
 
-					<TextBlock Text="Scenario" FontSize="16" FontWeight="SemiBold" Margin="0,6,0,0"/>
-					<StackPanel Orientation="Horizontal" Spacing="10">
-						<Button Content="Scenario 1" Classes="option" Classes.selected="{Binding IsScenario1Selected}" Command="{Binding SetScenarioCommand}" CommandParameter="Scenario 1"/>
-						<Button Content="Scenario 2" Classes="option" Classes.selected="{Binding IsScenario2Selected}" Command="{Binding SetScenarioCommand}" CommandParameter="Scenario 2"/>
+					<StackPanel Spacing="8">
+						<TextBlock Text="Scenario" FontSize="16" FontWeight="SemiBold"/>
+						<StackPanel Orientation="Horizontal" Spacing="10">
+							<Button Content="Scenario 1" Classes="option" Classes.selected="{Binding IsScenario1Selected}" Command="{Binding SetScenarioCommand}" CommandParameter="Scenario 1"/>
+							<Button Content="Scenario 2" Classes="option" Classes.selected="{Binding IsScenario2Selected}" Command="{Binding SetScenarioCommand}" CommandParameter="Scenario 2"/>
+						</StackPanel>
 					</StackPanel>
-				</StackPanel>
+				</WrapPanel>
 			</Border>
 
 			<TextBlock Text="{Binding OptimizationSummary}" Foreground="#E2E2E2" FontStyle="Italic"/>
@@ -63,6 +103,238 @@
 
 			<Border Background="#1F1F1F" CornerRadius="6" BorderBrush="#303030" BorderThickness="1" Padding="10">
 				<TextBlock Text="{Binding LastOptimizationMessage}" Foreground="#BFBFBF"/>
+			</Border>
+
+			<!-- Data Visualization Section -->
+			<Separator Background="#3D3D3D" Height="2" Margin="0,8,0,8"/>
+
+			<TextBlock Text="Data Visualization" FontSize="22" FontWeight="SemiBold" Foreground="White"/>
+			<TextBlock Text="Charts update from the selected optimization result." Foreground="#D0D0D0"/>
+
+			<Border Classes="panel">
+				<StackPanel Spacing="10">
+					<TextBlock Text="Net Production Costs (€/MWh)" Classes="sectionTitle"/>
+					<Border Background="#1F1F1F" BorderBrush="#3D3D3D" BorderThickness="1" CornerRadius="6" Padding="8">
+						<lvc:CartesianChart Series="{Binding NetProductionCostSeries}"
+											XAxes="{Binding NetProductionCostXAxes}"
+											YAxes="{Binding NetProductionCostYAxes}"
+											LegendPosition="Top"
+											TooltipPosition="Top"
+											Height="360"
+											Background="#1F1F1F"/>
+					</Border>
+				</StackPanel>
+			</Border>
+
+			<Border Classes="panel">
+				<StackPanel Spacing="10">
+					<TextBlock Text="Result Selection" Classes="sectionTitle"/>
+					<ComboBox ItemsSource="{Binding Results}" SelectedItem="{Binding SelectedResult}" Width="360">
+						<ComboBox.ItemTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding SummaryMessage}" TextWrapping="Wrap"/>
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
+					<TextBlock Text="{Binding SelectedResultDescription}" Foreground="#CFCFCF" FontStyle="Italic"/>
+				</StackPanel>
+			</Border>
+
+			<Border Classes="panel">
+				<StackPanel Spacing="10">
+					<TextBlock Text="Summary Metrics" Classes="sectionTitle"/>
+					<ItemsControl ItemsSource="{Binding SummaryMetrics}">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<WrapPanel/>
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<Border Classes="metricCard" Margin="0,0,10,10">
+									<StackPanel Spacing="6">
+										<Border Background="{Binding AccentBrush}" Height="4" CornerRadius="4"/>
+										<TextBlock Text="{Binding Title}" FontWeight="SemiBold"/>
+										<TextBlock Text="{Binding ValueText}" Foreground="White" FontSize="16"/>
+									</StackPanel>
+								</Border>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</StackPanel>
+			</Border>
+
+			<Border Classes="panel">
+				<StackPanel Spacing="10">
+					<TextBlock Text="Settings for Production Units" Classes="sectionTitle"/>
+					<ScrollViewer Classes="optimizer-scroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+						<ItemsControl ItemsSource="{Binding ProductionUnitSettings}" Padding="0,0,0,20">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<StackPanel Orientation="Horizontal"/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<Border Background="#232323" BorderBrush="#3D3D3D" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,10,0" Width="230" HorizontalAlignment="Left">
+										<StackPanel Spacing="4">
+											<TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+											<TextBlock Text="{Binding ShortName}" Foreground="#C0C0C0"/>
+											<TextBlock Text="{Binding IsActive, StringFormat='Active: {0}'}" Foreground="{Binding StatusBrush}"/>
+											<TextBlock Text="{Binding MaxHeat, StringFormat='Max heat: {0:F1}'}"/>
+											<TextBlock Text="{Binding CostPerMWh, StringFormat='Cost/MWh: {0:F1}'}"/>
+											<TextBlock Text="{Binding Co2PerMWh, StringFormat='CO2/MWh: {0:F1}'}"/>
+											<TextBlock Text="{Binding ElectricityPerHeatMWh, StringFormat='Elec/Heat: {0:F2}'}"/>
+										</StackPanel>
+									</Border>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</ScrollViewer>
+				</StackPanel>
+			</Border>
+
+			<Border Classes="panel">
+				<StackPanel Spacing="10">
+					<TextBlock Text="Heat Demand (MWh)" Classes="sectionTitle"/>
+					<ScrollViewer Classes="optimizer-scroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+						<ItemsControl ItemsSource="{Binding HeatDemandSeries}" Padding="0,0,0,20">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<StackPanel Orientation="Horizontal"/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<Border Classes="barCell" Margin="0,0,8,0">
+										<StackPanel>
+											<TextBlock Text="{Binding ValueText}" FontSize="10" HorizontalAlignment="Center"/>
+											<Grid Height="130" Margin="0,4,0,4">
+												<Border Background="#2C2C2C" CornerRadius="3" VerticalAlignment="Bottom" Height="120" Opacity="0.18"/>
+												<Border Background="#CD5C5C" CornerRadius="3" VerticalAlignment="Bottom" Height="{Binding BarHeight}"/>
+											</Grid>
+											<TextBlock Text="{Binding Label}" FontSize="9" TextAlignment="Center" TextWrapping="Wrap"/>
+										</StackPanel>
+									</Border>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</ScrollViewer>
+				</StackPanel>
+			</Border>
+
+			<Border Classes="panel">
+				<StackPanel Spacing="10">
+					<TextBlock Text="Heat Production (MWh)" Classes="sectionTitle"/>
+					<ScrollViewer Classes="optimizer-scroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+						<ItemsControl ItemsSource="{Binding HeatProductionSeries}" Padding="0,0,0,20">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<StackPanel Orientation="Horizontal"/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<Border Classes="barCell" Margin="0,0,8,0">
+										<StackPanel>
+											<TextBlock Text="{Binding ValueText}" FontSize="10" HorizontalAlignment="Center"/>
+											<Grid Height="130" Margin="0,4,0,4">
+												<Border Background="#2C2C2C" CornerRadius="3" VerticalAlignment="Bottom" Height="120" Opacity="0.18"/>
+												<Border Background="#2E8B57" CornerRadius="3" VerticalAlignment="Bottom" Height="{Binding BarHeight}"/>
+											</Grid>
+											<TextBlock Text="{Binding Label}" FontSize="9" TextAlignment="Center" TextWrapping="Wrap"/>
+										</StackPanel>
+									</Border>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</ScrollViewer>
+				</StackPanel>
+			</Border>
+
+			<Border Classes="panel">
+				<StackPanel Spacing="10">
+					<TextBlock Text="Electricity Prices (€/MWh)" Classes="sectionTitle"/>
+					<ScrollViewer Classes="optimizer-scroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+						<ItemsControl ItemsSource="{Binding ElectricityPriceSeries}" Padding="0,0,0,20">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<StackPanel Orientation="Horizontal"/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<Border Classes="barCell" Margin="0,0,8,0">
+										<StackPanel>
+											<TextBlock Text="{Binding ValueText}" FontSize="10" HorizontalAlignment="Center"/>
+											<Grid Height="130" Margin="0,4,0,4">
+												<Border Background="#2C2C2C" CornerRadius="3" VerticalAlignment="Bottom" Height="120" Opacity="0.18"/>
+												<Border Background="#9370DB" CornerRadius="3" VerticalAlignment="Bottom" Height="{Binding BarHeight}"/>
+											</Grid>
+											<TextBlock Text="{Binding Label}" FontSize="9" TextAlignment="Center" TextWrapping="Wrap"/>
+										</StackPanel>
+									</Border>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</ScrollViewer>
+				</StackPanel>
+			</Border>
+
+			<Border Classes="panel">
+				<StackPanel Spacing="10">
+					<TextBlock Text="Electricity Production / Consumption (MWh)" Classes="sectionTitle"/>
+					<ScrollViewer Classes="optimizer-scroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+						<ItemsControl ItemsSource="{Binding ElectricityBalanceSeries}" Padding="0,0,0,20">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<StackPanel Orientation="Horizontal"/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<Border Margin="0,0,8,0" Width="64">
+										<StackPanel>
+											<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="6">
+												<TextBlock Text="{Binding ProductionText}" FontSize="9" Foreground="#FFD700"/>
+												<TextBlock Text="{Binding ConsumptionText}" FontSize="9" Foreground="#FF4500"/>
+											</StackPanel>
+											<Grid Height="130" Margin="0,4,0,4">
+												<Border Background="#2C2C2C" CornerRadius="3" VerticalAlignment="Bottom" Height="120" Opacity="0.18"/>
+												<Grid ColumnDefinitions="*,6,*" VerticalAlignment="Bottom">
+													<Border Grid.Column="0" Background="#FFD700" CornerRadius="3" VerticalAlignment="Bottom" Height="{Binding ProductionBarHeight}"/>
+													<Border Grid.Column="2" Background="#FF4500" CornerRadius="3" VerticalAlignment="Bottom" Height="{Binding ConsumptionBarHeight}"/>
+												</Grid>
+											</Grid>
+											<TextBlock Text="{Binding Label}" FontSize="9" TextAlignment="Center" TextWrapping="Wrap"/>
+										</StackPanel>
+									</Border>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</ScrollViewer>
+				</StackPanel>
+			</Border>
+
+			<Border Classes="panel">
+				<StackPanel Spacing="10">
+					<TextBlock Text="Priorities of Production Units (Net Production Costs)" Classes="sectionTitle"/>
+					<ItemsControl ItemsSource="{Binding PriorityRanking}">
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<Border Background="#232323" BorderBrush="#3D3D3D" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,8">
+									<StackPanel Orientation="Horizontal" Spacing="16">
+										<TextBlock Text="{Binding UnitName}" Width="160" FontWeight="SemiBold"/>
+										<TextBlock Text="{Binding HeatProduced, StringFormat='Heat: {0:F1}'}" Width="120"/>
+										<TextBlock Text="{Binding NetCost, StringFormat='Cost: {0:F1}'}" Width="140"/>
+										<TextBlock Text="{Binding NetCostPerMWh, StringFormat='Net cost/MWh: {0:F1}'}" Width="180"/>
+										<TextBlock Text="{Binding Co2, StringFormat='CO2: {0:F1}'}" Width="100"/>
+									</StackPanel>
+								</Border>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</StackPanel>
 			</Border>
 		</StackPanel>
 	</ScrollViewer>

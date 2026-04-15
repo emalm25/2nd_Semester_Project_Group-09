@@ -2,77 +2,124 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:HeatProductionOptimization.ViewModels"
+    xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
     x:Class="HeatProductionOptimization.Views.SourceDataView"
     x:DataType="vm:SourceDataViewModel">
 
+    <UserControl.Styles>
+        <Styles>
 
-   <UserControl.Styles>
-    <Styles>
+            <Style Selector="ComboBox">
+                <Setter Property="Background" Value="#d94545"/>
+                <Setter Property="BorderBrush" Value="Black"/>
+            </Style>
 
-        <Style Selector="ComboBox">
-            <Setter Property="Background" Value="#d94545"/>
-            <Setter Property="BorderBrush" Value="Black"/>
-        </Style>
+            <Style Selector="ComboBoxItem">
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Background" Value="#3f3f3f"/>
+            </Style>
 
+            <Style Selector="ComboBoxItem:pointerover">
+                <Setter Property="Background" Value="#555555"/>
+            </Style>
 
-        <Style Selector="ComboBoxItem">
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Background" Value="#3f3f3f"/>
-        </Style>
+            <Style Selector="ComboBoxItem:selected">
+                <Setter Property="Background" Value="#d94545"/>
+            </Style>
 
-       
-        <Style Selector="ComboBoxItem:pointerover">
-            <Setter Property="Background" Value="#555555"/>
-        </Style>
+        </Styles>
+    </UserControl.Styles>
 
-    
-        <Style Selector="ComboBoxItem:selected">
-            <Setter Property="Background" Value="#d94545"/>
-        </Style>
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto,*">
 
-    </Styles>
-</UserControl.Styles>
+        <ComboBox Grid.Row="0"
+                  Margin="10"
+                  Width="150"
+                  ItemsSource="{Binding Periods}"
+                  SelectedItem="{Binding SelectedPeriod, Mode=TwoWay}"
+                  HorizontalContentAlignment="Center">
+            <ComboBox.SelectionBoxItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" Foreground="White"/>
+                </DataTemplate>
+            </ComboBox.SelectionBoxItemTemplate>
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto,*">
-
-       <ComboBox Grid.Row="0"
-          Margin="10"
-          Width="150"
-             ItemsSource="{Binding Periods}"
-             SelectedItem="{Binding SelectedPeriod, Mode=TwoWay}"
-          HorizontalContentAlignment="Center">
-
-    <ComboBox.SelectionBoxItemTemplate>
-        <DataTemplate>
-            <TextBlock Text="{Binding}" Foreground="White"/>
-        </DataTemplate>
-    </ComboBox.SelectionBoxItemTemplate>
-
-    <ComboBox.ItemTemplate>
-        <DataTemplate>
-            <TextBlock Text="{Binding}" Foreground="White"/>
-        </DataTemplate>
-    </ComboBox.ItemTemplate>
-
-    </ComboBox>
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" Foreground="White"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
 
         <TextBlock Grid.Row="1"
                    Text="Heat Demand"
                    FontSize="20"
+                   Foreground="White"
                    Margin="10"/>
 
-        <Border Grid.Row="2"
-                Margin="10"
-                Background="LightGray"/>
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    Margin="10,5">
+            <TextBlock Text="{Binding AverageHeatDemand, StringFormat='Avg: {0} MW'}"
+                       Foreground="#a0a0a0"
+                       Margin="10,0"
+                       FontSize="12"/>
+            <TextBlock Text="{Binding MinHeatDemand, StringFormat='Min: {0} MW'}"
+                       Foreground="#a0a0a0"
+                       Margin="10,0"
+                       FontSize="12"/>
+            <TextBlock Text="{Binding MaxHeatDemand, StringFormat='Max: {0} MW'}"
+                       Foreground="#a0a0a0"
+                       Margin="10,0"
+                       FontSize="12"/>
+        </StackPanel>
 
-        <TextBlock Grid.Row="3"
+        <Border Grid.Row="3"
+            Margin="10"
+            BorderThickness="2"
+            BorderBrush="#d94545"
+            CornerRadius="5"
+            Background="White">
+            <lvc:CartesianChart Series="{Binding HeatDemandSeries}"
+                    XAxes="{Binding TimeAxes}"
+                    YAxes="{Binding HeatDemandYAxes}"
+                    Background="White"/>
+        </Border>
+
+        <TextBlock Grid.Row="4"
                    Text="Electricity Prices"
                    FontSize="20"
+                   Foreground="White"
                    Margin="10"/>
 
-        <Border Grid.Row="4"
-                Margin="10"
-                Background="LightGray"/>
+        <StackPanel Grid.Row="5"
+                    Orientation="Horizontal"
+                    Margin="10,5">
+            <TextBlock Text="{Binding AverageElectricityPrice, StringFormat='Avg: {0} €/MWh'}"
+                       Foreground="#a0a0a0"
+                       Margin="10,0"
+                       FontSize="12"/>
+            <TextBlock Text="{Binding MinElectricityPrice, StringFormat='Min: {0} €/MWh'}"
+                       Foreground="#a0a0a0"
+                       Margin="10,0"
+                       FontSize="12"/>
+            <TextBlock Text="{Binding MaxElectricityPrice, StringFormat='Max: {0} €/MWh'}"
+                       Foreground="#a0a0a0"
+                       Margin="10,0"
+                       FontSize="12"/>
+        </StackPanel>
+
+        <Border Grid.Row="6"
+            Margin="10"
+            BorderThickness="2"
+            BorderBrush="#d94545"
+            CornerRadius="5"
+            Background="White">
+            <lvc:CartesianChart Series="{Binding ElectricityPriceSeries}"
+                    XAxes="{Binding TimeAxes}"
+                    YAxes="{Binding ElectricityPriceYAxes}"
+                    Background="White"/>
+        </Border>
 
     </Grid>
 

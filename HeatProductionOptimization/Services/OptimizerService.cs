@@ -12,10 +12,10 @@ public class OptimizerService
     private readonly SourceManager sourceManager;
     private readonly AssetManager assetManager;
 
-    public OptimizerService()
+    public OptimizerService(AssetManager assetManager)
     {
         sourceManager = new SourceManager();
-        assetManager = new AssetManager();
+        this.assetManager = assetManager;
     }
 
     public OptimizationResult Optimize(
@@ -50,6 +50,33 @@ public class OptimizerService
 
         foreach (var row in sourceRows)
         {
+            var demand = row.HeatDemand * scenarioFactor;
+            
+            // Validate: Check if total available capacity can meet demand
+            var totalAvailableCapacity = availableUnits.Sum(unit => unit.MaxHeatMW);
+            if (totalAvailableCapacity < demand - 0.0001)
+            {
+                // Cannot meet demand - return error result
+                result.StatusMessage = $"CRITICAL: Insufficient capacity to meet demand. Available: {totalAvailableCapacity:F1} MWh, Demand: {demand:F1} MWh";
+                result.Timeline.Add(new OptimizationTimePoint
+                {
+                    StartTime = row.StartTime,
+                    EndTime = row.EndTime,
+                    HeatDemand = demand,
+                    HeatDelivered = 0,
+                    ElectricityPrice = row.ElectricityPrice,
+                    Cost = 0,
+                    Co2 = 0,
+                    ElectricityProduced = 0,
+                    ElectricityConsumed = 0,
+                    NetElectricity = 0,
+                    Dispatches = new List<OptimizationResult.DispatchResult>(),
+                    DemandMet = false
+                });
+                continue;
+            }
+
+            // Rank units according to objective while respecting heat availability priority
             var rankedUnits = objective == OptimizationResult.ObjectiveType.Cost
                 ? availableUnits
                     .OrderBy(unit => CalculateEffectiveCostPerMWh(unit.CostPerMWh, unit.ElectricityPerHeatMWh, row.ElectricityPrice))
@@ -61,13 +88,13 @@ public class OptimizerService
                     .ThenBy(unit => unit.Priority)
                     .ToList();
 
-            var demand = row.HeatDemand * scenarioFactor;
             var remainingDemand = demand;
             var timeDispatches = new List<OptimizationResult.DispatchResult>();
 
+            // First pass: assign heat to optimal units
             foreach (var unit in rankedUnits)
             {
-                if (remainingDemand <= 0)
+                if (remainingDemand <= 0.0001)
                 {
                     break;
                 }
@@ -98,9 +125,49 @@ public class OptimizerService
                 });
             }
 
+            // Second pass: if demand not fully met, use any remaining unit capacity
+            if (remainingDemand > 0.0001)
+            {
+                foreach (var unit in rankedUnits)
+                {
+                    if (remainingDemand <= 0.0001)
+                    {
+                        break;
+                    }
+
+                    var alreadyUsed = timeDispatches
+                        .Where(d => d.UnitName == unit.Unit.Name)
+                        .Sum(d => d.HeatProduced);
+                    
+                    var remainingCapacity = unit.MaxHeatMW - alreadyUsed;
+                    if (remainingCapacity <= 0)
+                    {
+                        continue;
+                    }
+
+                    var additionalHeat = Math.Min(remainingCapacity, remainingDemand);
+                    remainingDemand -= additionalHeat;
+
+                    var existing = timeDispatches.FirstOrDefault(d => d.UnitName == unit.Unit.Name);
+                    if (existing != null)
+                    {
+                        existing.HeatProduced += additionalHeat;
+                        var electricityFlow = additionalHeat * unit.ElectricityPerHeatMWh;
+                        var electricityRevenue = electricityFlow > 0 ? electricityFlow * row.ElectricityPrice : 0;
+                        var electricityCost = electricityFlow < 0 ? -electricityFlow * row.ElectricityPrice : 0;
+                        existing.Cost += additionalHeat * unit.CostPerMWh - electricityRevenue + electricityCost;
+                        existing.Co2 += additionalHeat * (unit.Co2PerMWh ?? 0);
+                        existing.ElectricityProduced += electricityFlow > 0 ? electricityFlow : 0;
+                        existing.ElectricityConsumed += electricityFlow < 0 ? -electricityFlow : 0;
+                    }
+                }
+            }
+
             var delivered = timeDispatches.Sum(dispatch => dispatch.HeatProduced);
             var timeCost = timeDispatches.Sum(dispatch => dispatch.Cost);
             var timeCo2 = timeDispatches.Sum(dispatch => dispatch.Co2);
+            var timeElectricityProduced = timeDispatches.Sum(dispatch => dispatch.ElectricityProduced);
+            var timeElectricityConsumed = timeDispatches.Sum(dispatch => dispatch.ElectricityConsumed);
             var timeNetElectricity = timeDispatches.Sum(dispatch => dispatch.ElectricityProduced - dispatch.ElectricityConsumed);
 
             result.Timeline.Add(new OptimizationTimePoint
@@ -109,9 +176,23 @@ public class OptimizerService
                 EndTime = row.EndTime,
                 HeatDemand = demand,
                 HeatDelivered = delivered,
+                ElectricityPrice = row.ElectricityPrice,
                 Cost = timeCost,
                 Co2 = timeCo2,
+                ElectricityProduced = timeElectricityProduced,
+                ElectricityConsumed = timeElectricityConsumed,
                 NetElectricity = timeNetElectricity,
+                Dispatches = timeDispatches
+                    .Select(dispatch => new OptimizationResult.DispatchResult
+                    {
+                        UnitName = dispatch.UnitName,
+                        HeatProduced = dispatch.HeatProduced,
+                        Cost = dispatch.Cost,
+                        Co2 = dispatch.Co2,
+                        ElectricityProduced = dispatch.ElectricityProduced,
+                        ElectricityConsumed = dispatch.ElectricityConsumed
+                    })
+                    .ToList(),
                 DemandMet = delivered + 0.0001 >= demand
             });
 
@@ -144,9 +225,7 @@ public class OptimizerService
             : $"Warning: Unable to meet full demand. Unmet heat in period: {unmetDemand:F1} MWh.";
 
         result.SummaryMessage =
-            $"Objective: {objective}, Season: {season}, Scenario: {scenario}, Points: {result.Timeline.Count}, " +
-            $"Demand: {result.TotalDemand:F1} MWh, Delivered: {result.TotalHeat:F1} MWh, Cost: {result.TotalCost:F1}, " +
-            $"CO2: {result.TotalCo2:F1}, Net electricity: {result.NetElectricity:F1} MWh.";
+            $"Objective: {objective} | Season: {season} | Scenario: {scenario}";
 
         return result;
     }

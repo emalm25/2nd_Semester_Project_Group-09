@@ -8,10 +8,12 @@ using CommunityToolkit.Mvvm.ComponentModel;
 public class AssetManagerViewModel : ViewModelBase
 {
 	public List<ProductionUnitItemViewModel> Units { get; }
+    public AssetManager AssetManager { get; }
 
-	public AssetManagerViewModel()
+	public AssetManagerViewModel(AssetManager? assetManager = null)
 	{
-		Units = new AssetManager().Units.Select(u => new ProductionUnitItemViewModel(u)).ToList();
+		AssetManager = assetManager ?? new AssetManager();
+		Units = AssetManager.Units.Select(u => new ProductionUnitItemViewModel(u)).ToList();
 	}
 }
 

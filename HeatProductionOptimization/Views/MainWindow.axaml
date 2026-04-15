@@ -18,10 +18,8 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <!-- styles for tabs -->
     <Window.Styles>
         <Styles>
-            <!-- make each tab header a white rectangle with black text and border -->
             <Style Selector="TabItem">
                 <Setter Property="Background" Value="#d94545"/>
                 <Setter Property="Foreground" Value="White"/>
@@ -38,22 +36,19 @@
             <Style Selector="TabItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
 			    <Setter Property="Foreground" Value="#d94545"/>
 		    </Style>
-            <!-- optional: adjust TabControl chrome if needed -->
             <Style Selector="TabControl">
                 <Setter Property="TabStripPlacement" Value="Top"/>
             </Style>
         </Styles>
     </Window.Styles>
 
-    <!-- main window content replaced with tabs for each manager -->
     <TabControl>
 
         <TabItem Header="Welcome" IsSelected="True">
-            <TextBlock Text="Welcome to our heat production optimizer!" Margin="10" FontSize="18" Foreground="White"/>
+            <views:WelcomeView/>
         </TabItem>
 
         <TabItem Header="Asset Manager">
-            <!-- content for asset manager tab in seperate view -->
             <views:AssetManagerView DataContext="{Binding AssetManagerViewModel}"/>
         </TabItem>
 
@@ -67,10 +62,6 @@
 
         <TabItem Header="Optimizer">
             <views:OptimizerView DataContext="{Binding OptimizerVM}"/>
-        </TabItem>
-
-        <TabItem Header="Data Visualization">
-            <TextBlock Text="Visualize data here" Margin="10" FontSize="18" Foreground="White"/>
         </TabItem>
 
     </TabControl>

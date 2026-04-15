@@ -6,7 +6,7 @@
     x:Class="HeatProductionOptimization.Views.AssetManagerView">
 
     <StackPanel>
-        <TextBlock Text="Asset manager information" Margin="10" FontSize="18" Foreground="White"/>
+        <TextBlock Text="Asset manager information" Margin="18" FontSize="22" FontWeight="SemiBold"/>
         <ScrollViewer Classes="asset-scroll" AllowAutoHide="True" HorizontalScrollBarVisibility="Visible" VerticalAlignment="Top" Padding="0">
             <!-- Custom styles for the scrollbar -->
             <ScrollViewer.Styles>

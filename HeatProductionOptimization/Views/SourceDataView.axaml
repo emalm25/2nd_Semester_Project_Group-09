@@ -9,21 +9,30 @@
     <UserControl.Styles>
         <Styles>
 
-            <Style Selector="ComboBoxPopup">
-                    <Setter Property="Background" Value="#2A2A2A"/>
-            </Style>
-
-            <Style Selector="ComboBoxPopup Border">
-                <Setter Property="Background" Value="#2A2A2A"/>
-                <Setter Property="BorderBrush" Value="#d94545"/>
-            </Style>
-
-            <Style Selector="ComboBox /template/ Border">
+            <Style Selector="ComboBox"> 
                 <Setter Property="Background" Value="#d94545"/>
             </Style>
 
-            <Style Selector="ComboBoxItem:pointerover">
+            <Style Selector="ComboBox /template/ Popup Border">
                 <Setter Property="Background" Value="#2A2A2A"/>
+                <Setter Property="BorderBrush" Value="#2A2A2A"/>
+            </Style>
+
+            <Style Selector="ComboBox /template/ Popup ScrollViewer">
+                <Setter Property="Background" Value="#2A2A2A"/>
+            </Style>
+
+            <Style Selector="ComboBox /template/ Border">
+                <Setter Property="Background" Value="#2A2A2A"/>
+            </Style>
+
+            <Style Selector="ComboBoxItem">
+                <Setter Property="Background" Value="#2A2A2A"/>
+                <Setter Property="Foreground" Value="#2A2A2A"/>
+            </Style>
+
+            <Style Selector="ComboBoxItem:pointerover">
+                <Setter Property="Background" Value="#d94545"/>
             </Style>
 
             <Style Selector="ComboBoxItem:selected">

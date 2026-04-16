@@ -2,7 +2,7 @@ namespace HeatProductionOptimization.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 public class AssetManagerViewModel : ViewModelBase
@@ -30,27 +30,22 @@ public class ProductionUnitItemViewModel : ObservableObject
 	public double? OilConsumption => unit.OilConsumption;
 	public double? Gas2Consumption => unit.Gas2Consumption;
 	public double? MaxElectricity => unit.MaxElectricity;
-	public Avalonia.Media.Imaging.Bitmap Image => unit.Image;
+	public Bitmap Image => unit.Image;
 
-	public bool IsActive
+	public bool IsAvailable
 	{
-		get => unit.IsActive;
+		get => unit.IsAvailable;
 		set
 		{
-			if (unit.IsActive == value)
+			if (unit.IsAvailable == value)
 			{
 				return;
 			}
 
-			unit.IsActive = value;
-			OnPropertyChanged(nameof(IsActive));
-			OnPropertyChanged(nameof(Status));
-			OnPropertyChanged(nameof(StatusColor));
+			unit.IsAvailable = value;
+			OnPropertyChanged(nameof(IsAvailable));
 		}
 	}
-
-	public string Status => IsActive ? "* ON *" : "* OFF *";
-	public IBrush StatusColor => IsActive ? Brushes.LimeGreen : new SolidColorBrush(Color.Parse("#d94545"));
 
 	public ProductionUnitItemViewModel(ProductionUnit unit)
 	{

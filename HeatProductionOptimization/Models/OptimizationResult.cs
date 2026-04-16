@@ -36,7 +36,7 @@ public class OptimizationResult
     public SeasonOption SeasonType { get; set; }
     public ScenarioOption ScenarioType { get; set; }
 
-    public List<DispatchResult> Dispatches { get; set; } = new();
+    public List<DispatchResult> DispatchesByUnit { get; set; } = new();
     public List<OptimizationTimePoint> Timeline { get; set; } = new();
 
     public double TotalHeat { get; set; }

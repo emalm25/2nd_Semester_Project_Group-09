@@ -39,11 +39,27 @@
                                 </Border>
                                 
                                 <!-- Unit Header -->
-                                <StackPanel Spacing="5">
-                                    <TextBlock Text="{Binding Status}" Foreground="{Binding StatusColor}" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold"/>
-                                    <TextBlock Text="{Binding ShortName}" FontSize="20" FontWeight="Bold"/>
-                                    <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"/>
-                                </StackPanel>
+                                <Border BorderThickness="0,0,0,2" BorderBrush="#d94545" Padding="0,0,0,10">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10" HorizontalAlignment="Stretch">
+                                    <StackPanel Grid.Column="0" Spacing="5">
+                                        <TextBlock Text="{Binding ShortName}" FontSize="20" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold"/>
+                                    </StackPanel>
+
+                                    <ToggleSwitch Grid.Column="1" IsChecked="{Binding IsAvailable, Mode=TwoWay}" OnContent="" OffContent="" HorizontalAlignment="Right">
+                                        <!-- Custom styles for the switch -->
+                                        <ToggleSwitch.Styles>
+                                            <Style Selector="ToggleSwitch:checked /template/ Border#SwitchKnobBounds">
+                                                <Setter Property="Background" Value="#d94545"/>
+                                            </Style>
+                                            <Style Selector="ToggleSwitch:unchecked /template/ Border#OuterBorder">
+                                                <Setter Property="Background" Value="#252525"/>
+                                                <Setter Property="BorderBrush" Value="#252525"/>
+                                            </Style>
+                                        </ToggleSwitch.Styles>
+                                    </ToggleSwitch>
+                                </Grid>
+                                </Border>
                                 
                                 <!-- Data Fields -->
                                 <StackPanel Spacing="10">

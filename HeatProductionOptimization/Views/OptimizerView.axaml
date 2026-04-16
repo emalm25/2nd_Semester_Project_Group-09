@@ -113,7 +113,7 @@
 
 			<Border Classes="panel">
 				<StackPanel Spacing="10">
-					<TextBlock Text="Net Production Costs (€/MWh)" Classes="sectionTitle"/>
+					<TextBlock Text="Heat Production by Unit (MWh)" Classes="sectionTitle"/>
 					<Border Background="#1F1F1F" BorderBrush="#3D3D3D" BorderThickness="1" CornerRadius="6" Padding="8">
 						<lvc:CartesianChart Series="{Binding NetProductionCostSeries}"
 											XAxes="{Binding NetProductionCostXAxes}"
@@ -196,93 +196,6 @@
 
 			<Border Classes="panel">
 				<StackPanel Spacing="10">
-					<TextBlock Text="Heat Demand (MWh)" Classes="sectionTitle"/>
-					<ScrollViewer Classes="optimizer-scroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-						<ItemsControl ItemsSource="{Binding HeatDemandSeries}" Padding="0,0,0,20">
-							<ItemsControl.ItemsPanel>
-								<ItemsPanelTemplate>
-									<StackPanel Orientation="Horizontal"/>
-								</ItemsPanelTemplate>
-							</ItemsControl.ItemsPanel>
-							<ItemsControl.ItemTemplate>
-								<DataTemplate>
-									<Border Classes="barCell" Margin="0,0,8,0">
-										<StackPanel>
-											<TextBlock Text="{Binding ValueText}" FontSize="10" HorizontalAlignment="Center"/>
-											<Grid Height="130" Margin="0,4,0,4">
-												<Border Background="#2C2C2C" CornerRadius="3" VerticalAlignment="Bottom" Height="120" Opacity="0.18"/>
-												<Border Background="#CD5C5C" CornerRadius="3" VerticalAlignment="Bottom" Height="{Binding BarHeight}"/>
-											</Grid>
-											<TextBlock Text="{Binding Label}" FontSize="9" TextAlignment="Center" TextWrapping="Wrap"/>
-										</StackPanel>
-									</Border>
-								</DataTemplate>
-							</ItemsControl.ItemTemplate>
-						</ItemsControl>
-					</ScrollViewer>
-				</StackPanel>
-			</Border>
-
-			<Border Classes="panel">
-				<StackPanel Spacing="10">
-					<TextBlock Text="Heat Production (MWh)" Classes="sectionTitle"/>
-					<ScrollViewer Classes="optimizer-scroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-						<ItemsControl ItemsSource="{Binding HeatProductionSeries}" Padding="0,0,0,20">
-							<ItemsControl.ItemsPanel>
-								<ItemsPanelTemplate>
-									<StackPanel Orientation="Horizontal"/>
-								</ItemsPanelTemplate>
-							</ItemsControl.ItemsPanel>
-							<ItemsControl.ItemTemplate>
-								<DataTemplate>
-									<Border Classes="barCell" Margin="0,0,8,0">
-										<StackPanel>
-											<TextBlock Text="{Binding ValueText}" FontSize="10" HorizontalAlignment="Center"/>
-											<Grid Height="130" Margin="0,4,0,4">
-												<Border Background="#2C2C2C" CornerRadius="3" VerticalAlignment="Bottom" Height="120" Opacity="0.18"/>
-												<Border Background="#2E8B57" CornerRadius="3" VerticalAlignment="Bottom" Height="{Binding BarHeight}"/>
-											</Grid>
-											<TextBlock Text="{Binding Label}" FontSize="9" TextAlignment="Center" TextWrapping="Wrap"/>
-										</StackPanel>
-									</Border>
-								</DataTemplate>
-							</ItemsControl.ItemTemplate>
-						</ItemsControl>
-					</ScrollViewer>
-				</StackPanel>
-			</Border>
-
-			<Border Classes="panel">
-				<StackPanel Spacing="10">
-					<TextBlock Text="Electricity Prices (€/MWh)" Classes="sectionTitle"/>
-					<ScrollViewer Classes="optimizer-scroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-						<ItemsControl ItemsSource="{Binding ElectricityPriceSeries}" Padding="0,0,0,20">
-							<ItemsControl.ItemsPanel>
-								<ItemsPanelTemplate>
-									<StackPanel Orientation="Horizontal"/>
-								</ItemsPanelTemplate>
-							</ItemsControl.ItemsPanel>
-							<ItemsControl.ItemTemplate>
-								<DataTemplate>
-									<Border Classes="barCell" Margin="0,0,8,0">
-										<StackPanel>
-											<TextBlock Text="{Binding ValueText}" FontSize="10" HorizontalAlignment="Center"/>
-											<Grid Height="130" Margin="0,4,0,4">
-												<Border Background="#2C2C2C" CornerRadius="3" VerticalAlignment="Bottom" Height="120" Opacity="0.18"/>
-												<Border Background="#9370DB" CornerRadius="3" VerticalAlignment="Bottom" Height="{Binding BarHeight}"/>
-											</Grid>
-											<TextBlock Text="{Binding Label}" FontSize="9" TextAlignment="Center" TextWrapping="Wrap"/>
-										</StackPanel>
-									</Border>
-								</DataTemplate>
-							</ItemsControl.ItemTemplate>
-						</ItemsControl>
-					</ScrollViewer>
-				</StackPanel>
-			</Border>
-
-			<Border Classes="panel">
-				<StackPanel Spacing="10">
 					<TextBlock Text="Electricity Production / Consumption (MWh)" Classes="sectionTitle"/>
 					<ScrollViewer Classes="optimizer-scroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
 						<ItemsControl ItemsSource="{Binding ElectricityBalanceSeries}" Padding="0,0,0,20">
@@ -325,10 +238,10 @@
 								<Border Background="#232323" BorderBrush="#3D3D3D" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,8">
 									<StackPanel Orientation="Horizontal" Spacing="16">
 										<TextBlock Text="{Binding UnitName}" Width="160" FontWeight="SemiBold"/>
-										<TextBlock Text="{Binding HeatProduced, StringFormat='Heat: {0:F1}'}" Width="120"/>
-										<TextBlock Text="{Binding NetCost, StringFormat='Cost: {0:F1}'}" Width="140"/>
-										<TextBlock Text="{Binding NetCostPerMWh, StringFormat='Net cost/MWh: {0:F1}'}" Width="180"/>
-										<TextBlock Text="{Binding Co2, StringFormat='CO2: {0:F1}'}" Width="100"/>
+										<TextBlock Text="{Binding HeatProduced, StringFormat='Heat: {0:F1} MWh'}" Width="150"/>
+										<TextBlock Text="{Binding NetCost, StringFormat='Cost: {0:F1} DKK'}" Width="170"/>
+										<TextBlock Text="{Binding NetCostPerMWh, StringFormat='Net cost: {0:F1} DKK/MWh'}" Width="210"/>
+										<TextBlock Text="{Binding Co2, StringFormat='CO2: {0:F1} kg'}" Width="120"/>
 									</StackPanel>
 								</Border>
 							</DataTemplate>

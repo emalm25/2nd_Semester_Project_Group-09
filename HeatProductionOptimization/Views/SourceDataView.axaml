@@ -14,13 +14,17 @@
                 <Setter Property="BorderBrush" Value="Black"/>
             </Style>
 
+            <Style Selector="ComboBox /template/ Popup">
+                <Setter Property="Background" Value="#2A2A2A"/>
+            </Style>
+
             <Style Selector="ComboBoxItem">
                 <Setter Property="Foreground" Value="White"/>
-                <Setter Property="Background" Value="#3f3f3f"/>
+                <Setter Property="Background" Value="#2A2A2A"/>
             </Style>
 
             <Style Selector="ComboBoxItem:pointerover">
-                <Setter Property="Background" Value="#555555"/>
+                <Setter Property="Background" Value="#2A2A2A"/>
             </Style>
 
             <Style Selector="ComboBoxItem:selected">
@@ -79,11 +83,11 @@
             BorderThickness="2"
             BorderBrush="#d94545"
             CornerRadius="5"
-            Background="White">
+            Background="#2E2E2E">
             <lvc:CartesianChart Series="{Binding HeatDemandSeries}"
                     XAxes="{Binding TimeAxes}"
                     YAxes="{Binding HeatDemandYAxes}"
-                    Background="White"/>
+                Background="#2A2A2A"/>
         </Border>
 
         <TextBlock Grid.Row="4"
@@ -114,11 +118,11 @@
             BorderThickness="2"
             BorderBrush="#d94545"
             CornerRadius="5"
-            Background="White">
+            Background="#2E2E2E">
             <lvc:CartesianChart Series="{Binding ElectricityPriceSeries}"
                     XAxes="{Binding TimeAxes}"
                     YAxes="{Binding ElectricityPriceYAxes}"
-                    Background="White"/>
+                Background="#2E2E2E"/>
         </Border>
 
     </Grid>

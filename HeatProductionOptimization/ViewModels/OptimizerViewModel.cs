@@ -19,7 +19,7 @@ namespace HeatProductionOptimization.ViewModels;
 public class OptimizerViewModel : ViewModelBase, IDisposable
 {
     private const double ChartHeight = 120;
-    private const int MaxChartPoints = 24;
+    private const int LabelIntervalHours = 4;
 
     private readonly OptimizerService optimizerService;
     private readonly ResultDataManager resultDataManager;
@@ -41,9 +41,6 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
 
     // Data Visualization collections
     public ObservableCollection<OptimizationResult> Results => resultDataManagerViewModel.Results;
-    public ObservableCollection<ChartPointViewModel> HeatDemandSeries { get; } = new();
-    public ObservableCollection<ChartPointViewModel> HeatProductionSeries { get; } = new();
-    public ObservableCollection<ChartPointViewModel> ElectricityPriceSeries { get; } = new();
     public ObservableCollection<ElectricityBalancePointViewModel> ElectricityBalanceSeries { get; } = new();
     public ObservableCollection<MetricCardViewModel> SummaryMetrics { get; } = new();
     public ObservableCollection<UnitSettingRowViewModel> ProductionUnitSettings { get; } = new();
@@ -204,8 +201,7 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
             $"Selected: {FormatObjective(selectedObjective)}, {selectedSeason}, {FormatScenario(selectedScenario)} | " +
             $"Points: {result.Timeline.Count} | Heat: {result.TotalHeat:F1} MWh | Cost: {result.TotalCost:F1} | CO2: {result.TotalCo2:F1} | Net el.: {result.NetElectricity:F1} MWh";
 
-        LastOptimizationMessage =
-            $"{result.StatusMessage}{Environment.NewLine}{BuildDispatchReport(result)}";
+        LastOptimizationMessage = result.StatusMessage;
 
         // Refresh visualization for the new result
         SelectedResult = result;
@@ -215,24 +211,6 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
     {
         OptimizationSummary =
             $"Current setup: {FormatObjective(selectedObjective)}, {selectedSeason}, {FormatScenario(selectedScenario)}";
-    }
-
-    private static string BuildDispatchReport(OptimizationResult result)
-    {
-        if (result.Dispatches.Count == 0)
-        {
-            return "No units were dispatched.";
-        }
-
-        var reportBuilder = new StringBuilder();
-        reportBuilder.Append("Dispatch: ");
-
-        var rows = result.Dispatches
-            .Select(dispatch =>
-                $"{dispatch.UnitName}: {dispatch.HeatProduced:F1} MW (Cost {dispatch.Cost:F1}, CO2 {dispatch.Co2:F2})");
-
-        reportBuilder.Append(string.Join(" | ", rows));
-        return reportBuilder.ToString();
     }
 
     private static string FormatObjective(OptimizationResult.ObjectiveType objective)
@@ -290,9 +268,6 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
 
     private void RefreshDashboard()
     {
-        HeatDemandSeries.Clear();
-        HeatProductionSeries.Clear();
-        ElectricityPriceSeries.Clear();
         ElectricityBalanceSeries.Clear();
         SummaryMetrics.Clear();
         PriorityRanking.Clear();
@@ -306,16 +281,13 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
             return;
         }
 
-        var sampledTimeline = SampleTimeline(SelectedResult.Timeline, MaxChartPoints).ToList();
-        BuildSeries(HeatDemandSeries, sampledTimeline.Select(point => (point.Label, point.HeatDemand)), Brushes.IndianRed);
-        BuildSeries(HeatProductionSeries, sampledTimeline.Select(point => (point.Label, point.HeatDelivered)), Brushes.SeaGreen);
-        BuildSeries(ElectricityPriceSeries, sampledTimeline.Select(point => (point.Label, point.ElectricityPrice)), Brushes.Gold);
-        BuildElectricityBalanceSeries(ElectricityBalanceSeries, sampledTimeline);
+        var displayedTimeline = GetDisplayedTimeline(SelectedResult.Timeline);
+        BuildElectricityBalanceSeries(ElectricityBalanceSeries, displayedTimeline);
         BuildNetProductionCostChart();
 
-        var totalProduced = SelectedResult.Dispatches.Sum(dispatch => dispatch.HeatProduced);
-        var totalElectricityProduced = SelectedResult.Dispatches.Sum(dispatch => dispatch.ElectricityProduced);
-        var totalElectricityConsumed = SelectedResult.Dispatches.Sum(dispatch => dispatch.ElectricityConsumed);
+        var totalProduced = SelectedResult.Timeline.Sum(point => point.HeatDelivered);
+        var totalElectricityProduced = SelectedResult.Timeline.Sum(point => point.ElectricityProduced);
+        var totalElectricityConsumed = SelectedResult.Timeline.Sum(point => point.ElectricityConsumed);
         var averageElectricityPrice = SelectedResult.Timeline.Any()
             ? SelectedResult.Timeline.Average(point => point.ElectricityPrice)
             : 0;
@@ -336,50 +308,133 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(SelectedResultDescription));
     }
 
-    private static IEnumerable<ChartSamplePoint> SampleTimeline(IReadOnlyCollection<OptimizationTimePoint> timeline, int maxPoints)
+    private static IReadOnlyList<OptimizationTimePoint> GetDisplayedTimeline(IReadOnlyList<OptimizationTimePoint> timeline)
     {
         if (timeline.Count == 0)
         {
-            yield break;
+            return Array.Empty<OptimizationTimePoint>();
         }
 
-        var points = timeline.ToList();
-        if (points.Count <= maxPoints)
+        var points = timeline
+            .Where(point => point.StartTime.Hour % LabelIntervalHours == 0)
+            .ToList();
+
+        if (points.Count == 0)
         {
-            foreach (var point in points)
-            {
-                yield return ToSamplePoint(point);
-            }
-
-            yield break;
+            points = timeline
+                .Where((point, index) => index % LabelIntervalHours == 0)
+                .ToList();
         }
 
-        var step = Math.Max(1, points.Count / maxPoints);
-        for (var index = 0; index < points.Count; index += step)
-        {
-            yield return ToSamplePoint(points[index]);
-        }
+        return points;
     }
 
-    private static ChartSamplePoint ToSamplePoint(OptimizationTimePoint point)
+    private static string FormatTimestampLabel(DateTime startTime)
     {
-        return new ChartSamplePoint
+        return startTime.ToString("dd/MM HH:mm");
+    }
+
+    private void BuildNetProductionCostChart()
+    {
+        if (SelectedResult == null || SelectedResult.Timeline.Count == 0)
         {
-            Label = point.StartTime.ToString("dd/MM HH:mm"),
-            HeatDemand = point.HeatDemand,
-            HeatDelivered = point.HeatDelivered,
-            ElectricityPrice = point.ElectricityPrice,
-            ElectricityProduced = point.ElectricityProduced,
-            ElectricityConsumed = point.ElectricityConsumed,
-            NetElectricity = point.NetElectricity
+            NetProductionCostSeries = Array.Empty<ISeries>();
+            NetProductionCostXAxes = Array.Empty<Axis>();
+            NetProductionCostYAxes = Array.Empty<Axis>();
+            return;
+        }
+
+        var points = SelectedResult.Timeline.ToList();
+
+        if (points.Count == 0)
+        {
+            NetProductionCostSeries = Array.Empty<ISeries>();
+            NetProductionCostXAxes = Array.Empty<Axis>();
+            NetProductionCostYAxes = Array.Empty<Axis>();
+            return;
+        }
+
+        var labels = points
+            .Select(point => point.StartTime.Hour % LabelIntervalHours == 0
+                ? FormatTimestampLabel(point.StartTime)
+                : string.Empty)
+            .ToArray();
+
+        var scenarioUnitShortNames = GetScenarioUnitOrderedShortNames(SelectedResult.ScenarioType);
+        var availableUnitNames = assetManagerViewModel.Units
+            .Where(unit => unit.IsAvailable)
+            .Select(unit => unit.ShortName)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var series = new List<ISeries>();
+
+        foreach (var unitShortName in scenarioUnitShortNames.Where(availableUnitNames.Contains))
+        {
+            var unitValues = points
+                .Select(point =>
+                {
+                    var unitDispatch = point.Dispatches
+                        .Where(dispatch => dispatch.UnitName == unitShortName)
+                        .Sum(dispatch => dispatch.HeatProduced);
+
+                    return unitDispatch;
+                })
+                .ToArray();
+
+            series.Add(new StackedColumnSeries<double>
+            {
+                Name = unitShortName,
+                Values = unitValues,
+                Fill = new SolidColorPaint(GetUnitColor(unitShortName)),
+                Stroke = null
+            });
+        }
+
+        var demandValues = points.Select(point => point.HeatDemand).ToArray();
+        series.Add(new LineSeries<double>
+        {
+            Name = "Heat Demand",
+            Values = demandValues,
+            Stroke = new SolidColorPaint(new SKColor(217, 69, 69)) { StrokeThickness = 3 },
+            Fill = null,
+            GeometrySize = 0,
+            LineSmoothness = 1,
+            GeometryFill = null,
+            GeometryStroke = null
+        });
+
+        NetProductionCostSeries = series.ToArray();
+        NetProductionCostXAxes = new Axis[]
+        {
+            new Axis
+            {
+                Labels = labels,
+                LabelsRotation = 45,
+                TextSize = 11,
+                LabelsPaint = new SolidColorPaint(SKColors.White),
+                NamePaint = new SolidColorPaint(SKColors.White),
+                Name = "Time"
+            }
+        };
+        
+        NetProductionCostYAxes = new Axis[]
+        {
+            new Axis
+            {
+                Name = "Heat Produced (MWh)",
+                MinLimit = 0,
+                TextSize = 11,
+                LabelsPaint = new SolidColorPaint(SKColors.White),
+                NamePaint = new SolidColorPaint(SKColors.White)
+            }
         };
     }
 
     private static void BuildElectricityBalanceSeries(
         ObservableCollection<ElectricityBalancePointViewModel> target,
-        IEnumerable<ChartSamplePoint> values)
+        IEnumerable<OptimizationTimePoint> points)
     {
-        var source = values.ToList();
+        var source = points.ToList();
         var maxValue = source
             .SelectMany(item => new[] { item.ElectricityProduced, item.ElectricityConsumed })
             .DefaultIfEmpty(1)
@@ -396,7 +451,7 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
             var consumptionHeight = item.ElectricityConsumed <= 0 ? 4 : Math.Max(4, item.ElectricityConsumed / maxValue * ChartHeight);
 
             target.Add(new ElectricityBalancePointViewModel(
-                item.Label,
+                FormatTimestampLabel(item.StartTime),
                 item.ElectricityProduced,
                 item.ElectricityConsumed,
                 productionHeight,
@@ -404,30 +459,9 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
         }
     }
 
-    private static void BuildSeries(
-        ObservableCollection<ChartPointViewModel> target,
-        IEnumerable<(string Label, double Value)> values,
-        IBrush positiveBrush,
-        bool allowNegative = false)
-    {
-        var source = values.ToList();
-        var maxValue = source.Select(item => Math.Abs(item.Value)).DefaultIfEmpty(1).Max();
-        if (maxValue <= 0)
-        {
-            maxValue = 1;
-        }
-
-        foreach (var item in source)
-        {
-            var height = Math.Max(4, Math.Abs(item.Value) / maxValue * ChartHeight);
-            var brush = allowNegative && item.Value < 0 ? Brushes.OrangeRed : positiveBrush;
-            target.Add(new ChartPointViewModel(item.Label, item.Value, height, brush));
-        }
-    }
-
     private static IEnumerable<UnitPriorityRowViewModel> BuildPriorityRanking(OptimizationResult result)
     {
-        return result.Dispatches
+        return result.DispatchesByUnit
             .Where(dispatch => dispatch.HeatProduced > 0)
             .Select(dispatch => new UnitPriorityRowViewModel
             {
@@ -451,108 +485,26 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
         return 0;
     }
 
-    private void BuildNetProductionCostChart()
+    private static string[] GetScenarioUnitOrderedShortNames(OptimizationResult.ScenarioOption scenario)
     {
-        if (SelectedResult == null || SelectedResult.Timeline.Count == 0)
-        {
-            NetProductionCostSeries = Array.Empty<ISeries>();
-            NetProductionCostXAxes = Array.Empty<Axis>();
-            NetProductionCostYAxes = Array.Empty<Axis>();
-            return;
-        }
-
-        var points = SelectedResult.Timeline;
-        var labels = points
-            .Select(point => point.StartTime.Hour % 6 == 0
-                ? point.StartTime.ToString("dd/MM HH:mm")
-                : string.Empty)
-            .ToArray();
-        var priceValues = points.Select(point => point.ElectricityPrice).ToArray();
-
-        var availableUnits = assetManagerViewModel.Units.Where(unit => unit.IsAvailable).ToList();
-        var series = new List<ISeries>
-        {
-            new LineSeries<double>
-            {
-                Name = "Electricity Price",
-                Values = priceValues,
-                Stroke = new SolidColorPaint(SKColors.Black) { StrokeThickness = 2 },
-                Fill = null,
-                GeometrySize = 0
-            }
-        };
-
-        foreach (var unit in availableUnits)
-        {
-            var electricityPerHeat = GetElectricityPerHeat(unit);
-            var unitValues = points
-                .Select(point =>
-                {
-                    var wasDispatched = point.Dispatches
-                        .Any(dispatch => dispatch.UnitName == unit.Name && dispatch.HeatProduced > 0.0001);
-
-                    if (!wasDispatched)
-                    {
-                        return double.NaN;
-                    }
-
-                    return CalculateEffectiveCostPerMWh((double)unit.ProductionCosts, electricityPerHeat, point.ElectricityPrice);
-                })
-                .ToArray();
-
-            series.Add(new LineSeries<double>
-            {
-                Name = $"{unit.ShortName} net prod costs",
-                Values = unitValues,
-                Stroke = new SolidColorPaint(GetUnitColor(unit.ShortName)) { StrokeThickness = 2 },
-                Fill = null,
-                GeometrySize = 0
-            });
-        }
-
-        NetProductionCostSeries = series.ToArray();
-        NetProductionCostXAxes = new Axis[]
-        {
-            new Axis
-            {
-                Labels = labels,
-                LabelsRotation = 90,
-                TextSize = 10,
-                LabelsPaint = new SolidColorPaint(SKColors.White),
-                NamePaint = new SolidColorPaint(SKColors.White)
-            }
-        };
-        NetProductionCostYAxes = new Axis[]
-        {
-            new Axis
-            {
-                Name = "€/MWh",
-                TextSize = 11,
-                LabelsPaint = new SolidColorPaint(SKColors.White),
-                NamePaint = new SolidColorPaint(SKColors.White)
-            }
-        };
+        return scenario == OptimizationResult.ScenarioOption.Scenario1
+            ? new[] { "GB1", "GB2", "GB3", "OB1" }
+            : new[] { "GB1", "GB2", "GM1", "EB1" };
     }
 
     private static SKColor GetUnitColor(string shortName)
     {
         return shortName.ToUpperInvariant() switch
         {
-            "GB1" => SKColors.Goldenrod,
-            "GB2" => SKColors.ForestGreen,
-            "GB3" => SKColors.SaddleBrown,
-            "OB1" => SKColors.DodgerBlue,
-            "GM1" => SKColors.LimeGreen,
+            // Heat-only boilers (green/blue accents)
+            "GB1" => SKColors.MediumSeaGreen,
+            "GB2" => SKColors.DodgerBlue,
+            "GB3" => SKColors.SteelBlue,
+            "OB1" => SKColors.Teal,
+            "GM1" => SKColors.Goldenrod,
             "EB1" => SKColors.MediumPurple,
             _ => SKColors.Gray
         };
-    }
-
-    private static double CalculateEffectiveCostPerMWh(double costPerMWh, double electricityPerHeatMWh, double electricityPricePerMWh)
-    {
-        var electricityRevenuePerMWhHeat = electricityPerHeatMWh > 0 ? electricityPerHeatMWh * electricityPricePerMWh : 0;
-        var electricityCostPerMWhHeat = electricityPerHeatMWh < 0 ? -electricityPerHeatMWh * electricityPricePerMWh : 0;
-        return costPerMWh - electricityRevenuePerMWhHeat + electricityCostPerMWhHeat;
     }
 
     private void SubscribeToAssetAvailabilityChanges()
@@ -587,23 +539,6 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
         UnsubscribeFromAssetAvailabilityChanges();
         resultDataManagerViewModel.PropertyChanged -= OnResultDataManagerPropertyChanged;
         resultDataManagerViewModel.Results.CollectionChanged -= OnResultsCollectionChanged;
-    }
-}
-
-public class ChartPointViewModel
-{
-    public string Label { get; }
-    public double Value { get; }
-    public string ValueText => Value.ToString("F1");
-    public double BarHeight { get; }
-    public IBrush BarBrush { get; }
-
-    public ChartPointViewModel(string label, double value, double barHeight, IBrush barBrush)
-    {
-        Label = label;
-        Value = value;
-        BarHeight = barHeight;
-        BarBrush = barBrush;
     }
 }
 
@@ -643,17 +578,6 @@ public class UnitPriorityRowViewModel
     public double NetCost { get; set; }
     public double NetCostPerMWh { get; set; }
     public double Co2 { get; set; }
-}
-
-internal class ChartSamplePoint
-{
-    public string Label { get; set; } = string.Empty;
-    public double HeatDemand { get; set; }
-    public double HeatDelivered { get; set; }
-    public double ElectricityPrice { get; set; }
-    public double ElectricityProduced { get; set; }
-    public double ElectricityConsumed { get; set; }
-    public double NetElectricity { get; set; }
 }
 
 public class ElectricityBalancePointViewModel

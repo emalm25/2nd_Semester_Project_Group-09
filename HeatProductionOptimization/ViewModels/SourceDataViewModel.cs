@@ -166,7 +166,9 @@ public class SourceDataViewModel : ViewModelBase
                 Values = heatValues,
                 Stroke = new SolidColorPaint(heatColor) { StrokeThickness = 2 },
                 Fill = null,
-                GeometrySize = 0
+                GeometrySize = 0,
+                GeometryFill = null,
+                GeometryStroke = null
             }
         };
 
@@ -178,7 +180,9 @@ public class SourceDataViewModel : ViewModelBase
                 Values = priceValues,
                 Stroke = new SolidColorPaint(priceColor) { StrokeThickness = 2 },
                 Fill = null,
-                GeometrySize = 0
+                GeometrySize = 0,
+                GeometryFill = null,
+                GeometryStroke = null
             }
         };
 

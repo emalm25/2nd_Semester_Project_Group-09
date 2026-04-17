@@ -114,14 +114,15 @@
 			<Border Classes="panel">
 				<StackPanel Spacing="10">
 					<TextBlock Text="Heat Production by Unit (MWh)" Classes="sectionTitle"/>
-					<Border Background="#2E2E2E" BorderBrush="#d94545" BorderThickness="2" CornerRadius="5" Padding="8">
+					<Border Background="#1F1F1F" BorderBrush="#3D3D3D" BorderThickness="1" CornerRadius="6" Padding="8">
 						<lvc:CartesianChart Series="{Binding NetProductionCostSeries}"
 											XAxes="{Binding NetProductionCostXAxes}"
 											YAxes="{Binding NetProductionCostYAxes}"
 											LegendPosition="Top"
 											TooltipPosition="Top"
+											Foreground="White"
 											Height="360"
-											Background="#2A2A2A"/>
+											Background="#1F1F1F"/>
 					</Border>
 				</StackPanel>
 			</Border>

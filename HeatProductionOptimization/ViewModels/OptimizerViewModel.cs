@@ -45,6 +45,7 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
     public ObservableCollection<MetricCardViewModel> SummaryMetrics { get; } = new();
     public ObservableCollection<UnitSettingRowViewModel> ProductionUnitSettings { get; } = new();
     public ObservableCollection<UnitPriorityRowViewModel> PriorityRanking { get; } = new();
+    public ObservableCollection<ChartLegendItemViewModel> MainChartLegendItems { get; } = new();
 
     public OptimizerViewModel(
         OptimizerService optimizerService,
@@ -277,6 +278,7 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
             NetProductionCostSeries = Array.Empty<ISeries>();
             NetProductionCostXAxes = Array.Empty<Axis>();
             NetProductionCostYAxes = Array.Empty<Axis>();
+            MainChartLegendItems.Clear();
             OnPropertyChanged(nameof(SelectedResultDescription));
             return;
         }
@@ -341,6 +343,7 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
             NetProductionCostSeries = Array.Empty<ISeries>();
             NetProductionCostXAxes = Array.Empty<Axis>();
             NetProductionCostYAxes = Array.Empty<Axis>();
+            MainChartLegendItems.Clear();
             return;
         }
 
@@ -351,6 +354,7 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
             NetProductionCostSeries = Array.Empty<ISeries>();
             NetProductionCostXAxes = Array.Empty<Axis>();
             NetProductionCostYAxes = Array.Empty<Axis>();
+            MainChartLegendItems.Clear();
             return;
         }
 
@@ -367,9 +371,11 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         var series = new List<ISeries>();
+        MainChartLegendItems.Clear();
 
         foreach (var unitShortName in scenarioUnitShortNames.Where(availableUnitNames.Contains))
         {
+            var unitColor = GetUnitColor(unitShortName);
             var unitValues = points
                 .Select(point =>
                 {
@@ -385,23 +391,32 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
             {
                 Name = unitShortName,
                 Values = unitValues,
-                Fill = new SolidColorPaint(GetUnitColor(unitShortName)),
+                Fill = new SolidColorPaint(unitColor),
                 Stroke = null
             });
+
+            MainChartLegendItems.Add(new ChartLegendItemViewModel(
+                unitShortName,
+                new SolidColorBrush(Color.FromArgb(unitColor.Alpha, unitColor.Red, unitColor.Green, unitColor.Blue))));
         }
 
+        var demandColor = new SKColor(217, 69, 69);
         var demandValues = points.Select(point => point.HeatDemand).ToArray();
         series.Add(new LineSeries<double>
         {
             Name = "Heat Demand",
             Values = demandValues,
-            Stroke = new SolidColorPaint(new SKColor(217, 69, 69)) { StrokeThickness = 3 },
+            Stroke = new SolidColorPaint(demandColor) { StrokeThickness = 3 },
             Fill = null,
             GeometrySize = 0,
             LineSmoothness = 1,
             GeometryFill = null,
             GeometryStroke = null
         });
+
+        MainChartLegendItems.Add(new ChartLegendItemViewModel(
+            "Heat Demand",
+            new SolidColorBrush(Color.FromArgb(demandColor.Alpha, demandColor.Red, demandColor.Green, demandColor.Blue))));
 
         NetProductionCostSeries = series.ToArray();
         NetProductionCostXAxes = new Axis[]
@@ -602,5 +617,17 @@ public class ElectricityBalancePointViewModel
         ElectricityConsumed = electricityConsumed;
         ProductionBarHeight = productionBarHeight;
         ConsumptionBarHeight = consumptionBarHeight;
+    }
+}
+
+public class ChartLegendItemViewModel
+{
+    public string Name { get; }
+    public IBrush ColorBrush { get; }
+
+    public ChartLegendItemViewModel(string name, IBrush colorBrush)
+    {
+        Name = name;
+        ColorBrush = colorBrush;
     }
 }

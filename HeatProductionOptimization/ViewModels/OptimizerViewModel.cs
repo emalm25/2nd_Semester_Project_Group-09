@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
 using HeatProductionOptimization.Models;
@@ -25,7 +26,8 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
     private readonly ResultDataManager resultDataManager;
     private readonly ResultDataManagerViewModel resultDataManagerViewModel;
     private readonly AssetManagerViewModel assetManagerViewModel;
-    
+    private Timer refreshTimer;
+
     private OptimizationResult.ObjectiveType selectedObjective = OptimizationResult.ObjectiveType.Cost;
     private OptimizationResult.SeasonOption selectedSeason = OptimizationResult.SeasonOption.Winter;
     private OptimizationResult.ScenarioOption selectedScenario = OptimizationResult.ScenarioOption.Scenario1;
@@ -65,7 +67,11 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
 
         resultDataManagerViewModel.PropertyChanged += OnResultDataManagerPropertyChanged;
         resultDataManagerViewModel.Results.CollectionChanged += OnResultsCollectionChanged;
+        assetManagerViewModel.Units.CollectionChanged += OnAssetUnitsCollectionChanged;
         SubscribeToAssetAvailabilityChanges();
+
+        // Auto-refresh timer to pick up changes from Asset Manager
+        refreshTimer = new Timer(RefreshIfNeeded, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
 
         BuildProductionUnitSettings();
         SelectedResult = resultDataManagerViewModel.SelectedResult ?? resultDataManagerViewModel.Results.LastOrDefault();
@@ -500,25 +506,51 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
         return 0;
     }
 
-    private static string[] GetScenarioUnitOrderedShortNames(OptimizationResult.ScenarioOption scenario)
+    private string[] GetScenarioUnitOrderedShortNames(OptimizationResult.ScenarioOption scenario)
     {
-        return scenario == OptimizationResult.ScenarioOption.Scenario1
+        // Get all available units from asset manager, ordered by scenario preference
+        var allUnits = assetManagerViewModel.Units
+            .Where(u => u.IsAvailable)
+            .Select(u => u.ShortName)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var preferredUnits = scenario == OptimizationResult.ScenarioOption.Scenario1
             ? new[] { "GB1", "GB2", "GB3", "OB1" }
             : new[] { "GB1", "GB2", "GM1", "EB1" };
+
+        // Return preferred units first, then any additional custom units
+        var ordered = preferredUnits.Where(allUnits.Contains).ToList();
+        var customUnits = allUnits.Except(preferredUnits).OrderBy(x => x);
+        ordered.AddRange(customUnits);
+
+        return ordered.ToArray();
     }
 
-    private static SKColor GetUnitColor(string shortName)
+    private SKColor GetUnitColor(string shortName)
     {
+        var colors = new[]
+        {
+            SKColors.MediumSeaGreen,
+            SKColors.DodgerBlue,
+            SKColors.SteelBlue,
+            SKColors.Teal,
+            SKColors.Goldenrod,
+            SKColors.MediumPurple,
+            SKColors.OrangeRed,
+            SKColors.LimeGreen,
+            SKColors.DeepSkyBlue,
+            SKColors.Gold
+        };
+
         return shortName.ToUpperInvariant() switch
         {
-            // Heat-only boilers (green/blue accents)
             "GB1" => SKColors.MediumSeaGreen,
             "GB2" => SKColors.DodgerBlue,
             "GB3" => SKColors.SteelBlue,
             "OB1" => SKColors.Teal,
             "GM1" => SKColors.Goldenrod,
             "EB1" => SKColors.MediumPurple,
-            _ => SKColors.Gray
+            _ => colors[Math.Abs(shortName.GetHashCode()) % colors.Length]
         };
     }
 
@@ -540,18 +572,63 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
 
     private void OnAssetUnitPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName != nameof(ProductionUnitItemViewModel.IsAvailable))
+        // Save changes to file
+        assetManagerViewModel.AssetManager.SaveUnits();
+
+        // Rebuild UI display
+        BuildProductionUnitSettings();
+
+        // Re-run optimization with updated units
+        if (SelectedResult != null)
         {
-            return;
+            RunOptimization();
+        }
+    }
+
+    private void OnAssetUnitsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.NewItems != null)
+        {
+            foreach (ProductionUnitItemViewModel unit in e.NewItems)
+            {
+                unit.PropertyChanged += OnAssetUnitPropertyChanged;
+            }
+        }
+        if (e.OldItems != null)
+        {
+            foreach (ProductionUnitItemViewModel unit in e.OldItems)
+            {
+                unit.PropertyChanged -= OnAssetUnitPropertyChanged;
+            }
         }
 
+        // Save changes
+        assetManagerViewModel.AssetManager.SaveUnits();
+
+        // Rebuild UI
         BuildProductionUnitSettings();
-        BuildNetProductionCostChart();
+
+        // Re-optimize
+        if (SelectedResult != null)
+        {
+            RunOptimization();
+        }
+    }
+
+    private void RefreshIfNeeded(object? state)
+    {
+        if (SelectedResult != null && assetManagerViewModel.IsEditMode)
+        {
+            // Auto-refresh optimizer when editing units
+            RunOptimization();
+        }
     }
 
     public void Dispose()
     {
+        refreshTimer?.Dispose();
         UnsubscribeFromAssetAvailabilityChanges();
+        assetManagerViewModel.Units.CollectionChanged -= OnAssetUnitsCollectionChanged;
         resultDataManagerViewModel.PropertyChanged -= OnResultDataManagerPropertyChanged;
         resultDataManagerViewModel.Results.CollectionChanged -= OnResultsCollectionChanged;
     }
@@ -584,6 +661,7 @@ public class UnitSettingRowViewModel
     public double Co2PerMWh { get; set; }
     public double ElectricityPerHeatMWh { get; set; }
     public IBrush StatusBrush { get; set; } = Brushes.Gray;
+    public bool ShowCo2 => Co2PerMWh > 0.001;
 }
 
 public class UnitPriorityRowViewModel
@@ -593,6 +671,7 @@ public class UnitPriorityRowViewModel
     public double NetCost { get; set; }
     public double NetCostPerMWh { get; set; }
     public double Co2 { get; set; }
+    public bool ShowCo2 => Co2 > 0.001;
 }
 
 public class ElectricityBalancePointViewModel

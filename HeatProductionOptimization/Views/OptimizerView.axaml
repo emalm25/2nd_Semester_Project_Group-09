@@ -114,11 +114,26 @@
 			<Border Classes="panel">
 				<StackPanel Spacing="10">
 					<TextBlock Text="Heat Production by Unit (MWh)" Classes="sectionTitle"/>
+					<ItemsControl ItemsSource="{Binding MainChartLegendItems}" HorizontalAlignment="Center">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<WrapPanel Orientation="Horizontal" ItemHeight="24"/>
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<StackPanel Orientation="Horizontal" Spacing="7" VerticalAlignment="Center" Margin="0,0,10,2">
+									<Border Width="12" Height="12" CornerRadius="6" Background="{Binding ColorBrush}"/>
+									<TextBlock Text="{Binding Name}" Foreground="White" FontWeight="SemiBold"/>
+								</StackPanel>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
 					<Border Background="#1F1F1F" BorderBrush="#3D3D3D" BorderThickness="1" CornerRadius="6" Padding="8">
 						<lvc:CartesianChart Series="{Binding NetProductionCostSeries}"
 											XAxes="{Binding NetProductionCostXAxes}"
 											YAxes="{Binding NetProductionCostYAxes}"
-											LegendPosition="Top"
+											LegendPosition="Hidden"
 											TooltipPosition="Top"
 											Height="360"
 											Background="#1F1F1F"/>

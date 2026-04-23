@@ -13,7 +13,7 @@ public class SourceDataViewModel : ViewModelBase
     private readonly SourceManager manager;
 
     private List<Data> data;
-    private string selectedPeriod = "Winter";
+    private string selectedPeriod = string.Empty;
 
     private ISeries[] heatDemandSeries = Array.Empty<ISeries>();
     private ISeries[] electricityPriceSeries = Array.Empty<ISeries>();
@@ -166,7 +166,9 @@ public class SourceDataViewModel : ViewModelBase
                 Values = heatValues,
                 Stroke = new SolidColorPaint(heatColor) { StrokeThickness = 2 },
                 Fill = null,
-                GeometrySize = 0
+                GeometrySize = 0,
+                GeometryFill = null,
+                GeometryStroke = null
             }
         };
 
@@ -178,7 +180,9 @@ public class SourceDataViewModel : ViewModelBase
                 Values = priceValues,
                 Stroke = new SolidColorPaint(priceColor) { StrokeThickness = 2 },
                 Fill = null,
-                GeometrySize = 0
+                GeometrySize = 0,
+                GeometryFill = null,
+                GeometryStroke = null
             }
         };
 
@@ -189,8 +193,8 @@ public class SourceDataViewModel : ViewModelBase
                 Labels = labels,
                 LabelsRotation = 35,
                 TextSize = 11,
-                LabelsPaint = new SolidColorPaint(SKColors.Black),
-                NamePaint = new SolidColorPaint(SKColors.Black)
+                LabelsPaint = new SolidColorPaint(SKColors.White),
+                NamePaint = new SolidColorPaint(SKColors.White)
             }
         };
 
@@ -200,8 +204,8 @@ public class SourceDataViewModel : ViewModelBase
             { 
                 Name = "MW", 
                 TextSize = 11,
-                LabelsPaint = new SolidColorPaint(SKColors.Black),
-                NamePaint = new SolidColorPaint(SKColors.Black)
+                LabelsPaint = new SolidColorPaint(SKColors.White),
+                NamePaint = new SolidColorPaint(SKColors.White)
             }
         };
 
@@ -211,8 +215,8 @@ public class SourceDataViewModel : ViewModelBase
             { 
                 Name = "EUR/MWh", 
                 TextSize = 11,
-                LabelsPaint = new SolidColorPaint(SKColors.Black),
-                NamePaint = new SolidColorPaint(SKColors.Black)
+                LabelsPaint = new SolidColorPaint(SKColors.White),
+                NamePaint = new SolidColorPaint(SKColors.White)
             }
         };
 

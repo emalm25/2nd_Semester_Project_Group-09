@@ -111,6 +111,7 @@ public class ProductionUnitItemViewModel : ObservableObject
 	private double? _gas2Consumption;
 	private double? _maxElectricity;
 	private bool _isAvailable;
+	private List<string> _scenarios;
 
 	public string ShortName
 	{
@@ -242,6 +243,19 @@ public class ProductionUnitItemViewModel : ObservableObject
 		}
 	}
 
+	public List<string> Scenarios
+	{
+		get => _scenarios;
+		set
+		{
+			if (SetProperty(ref _scenarios, value))
+			{
+				unit.Scenarios = value;
+				_onChanged?.Invoke();
+			}
+		}
+	}
+
 	public Bitmap Image => unit.Image;
 	public string UnitType => unit.GetType().Name;
 
@@ -260,5 +274,7 @@ public class ProductionUnitItemViewModel : ObservableObject
 		_gas2Consumption = unit.Gas2Consumption;
 		_maxElectricity = unit.MaxElectricity;
 		_isAvailable = unit.IsAvailable;
+		_scenarios = new List<string>(unit.Scenarios);
 	}
 }
+

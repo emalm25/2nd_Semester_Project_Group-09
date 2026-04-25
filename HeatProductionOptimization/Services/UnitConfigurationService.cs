@@ -41,18 +41,42 @@ public class UnitData
 
     [JsonPropertyName("maxElectricity")]
     public double? MaxElectricity { get; set; }
+
+    [JsonPropertyName("scenarios")]
+    public List<string> Scenarios { get; set; } = new() { "all" };
+}
+
+public class ScenarioData
+{
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = "";
+
+    [JsonPropertyName("displayName")]
+    public string DisplayName { get; set; } = "";
+
+    [JsonPropertyName("units")]
+    public List<string> Units { get; set; } = new();
+
+    [JsonPropertyName("maintenanceUnits")]
+    public Dictionary<string, string> MaintenanceUnits { get; set; } = new();
 }
 
 public class UnitConfigurationService
 {
     private readonly string _configPath;
+    private readonly string _scenariosConfigPath;
     private readonly JsonSerializerOptions _jsonOptions;
 
     public UnitConfigurationService()
     {
         _configPath = Path.Combine(
             AppDomain.CurrentDomain.BaseDirectory,
-            "units-config.json"
+            "units.json"
+        );
+
+        _scenariosConfigPath = Path.Combine(
+            AppDomain.CurrentDomain.BaseDirectory,
+            "scenarios-config.json"
         );
 
         _jsonOptions = new JsonSerializerOptions
@@ -130,6 +154,72 @@ public class UnitConfigurationService
         }
     }
 
+    public async Task<List<ScenarioData>> LoadScenariosAsync()
+    {
+        try
+        {
+            if (!File.Exists(_scenariosConfigPath))
+            {
+                return GetDefaultScenarios();
+            }
+
+            var json = await File.ReadAllTextAsync(_scenariosConfigPath);
+            var scenarios = JsonSerializer.Deserialize<List<ScenarioData>>(json, _jsonOptions);
+
+            return scenarios ?? GetDefaultScenarios();
+        }
+        catch
+        {
+            return GetDefaultScenarios();
+        }
+    }
+
+    public List<ScenarioData> LoadScenarios()
+    {
+        try
+        {
+            if (!File.Exists(_scenariosConfigPath))
+            {
+                return GetDefaultScenarios();
+            }
+
+            var json = File.ReadAllText(_scenariosConfigPath);
+            var scenarios = JsonSerializer.Deserialize<List<ScenarioData>>(json, _jsonOptions);
+
+            return scenarios ?? GetDefaultScenarios();
+        }
+        catch
+        {
+            return GetDefaultScenarios();
+        }
+    }
+
+    public async Task SaveScenariosAsync(List<ScenarioData> scenarios)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(scenarios, _jsonOptions);
+            await File.WriteAllTextAsync(_scenariosConfigPath, json);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error saving scenarios: {ex.Message}");
+        }
+    }
+
+    public void SaveScenarios(List<ScenarioData> scenarios)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(scenarios, _jsonOptions);
+            File.WriteAllText(_scenariosConfigPath, json);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error saving scenarios: {ex.Message}");
+        }
+    }
+
     private List<ProductionUnit> ConvertToProductionUnits(List<UnitData> unitsData)
     {
         var units = new List<ProductionUnit>();
@@ -161,7 +251,10 @@ public class UnitConfigurationService
             };
 
             if (unit != null)
+            {
+                unit.Scenarios = new List<string>(data.Scenarios ?? new List<string> { "all" });
                 units.Add(unit);
+            }
         }
 
         return units;
@@ -194,7 +287,8 @@ public class UnitConfigurationService
                 GasConsumption = unit.GasConsumption,
                 OilConsumption = unit.OilConsumption,
                 Gas2Consumption = unit.Gas2Consumption,
-                MaxElectricity = unit.MaxElectricity
+                MaxElectricity = unit.MaxElectricity,
+                Scenarios = new List<string>(unit.Scenarios)
             });
         }
 
@@ -205,12 +299,41 @@ public class UnitConfigurationService
     {
         return new List<ProductionUnit>
         {
-            new GasBoilersInfo("GB1", "Gas Boiler 1", true, 3.0, 510, 132, 1.05),
-            new GasBoilersInfo("GB2", "Gas Boiler 2", true, 2.0, 540, 134, 1.08),
-            new GasBoilersInfo("GB3", "Gas Boiler 3", true, 4.0, 580, 136, 1.09),
-            new OilBoilerInfo("OB1", "Oil Boiler 1", true, 6.0, 690, 147, 1.18),
-            new GasMotorInfo("GM1", "Gas Motor 1", true, 5.3, 3.9, 975, 227, 1.82),
-            new ElectricBoilerInfo("EB1", "Electric Boiler 1", true, 6.0, -6.0, 15)
+            new GasBoilersInfo("GB1", "Gas Boiler 1", true, 3.0, 510, 132, 1.05) { Scenarios = new List<string> { "Scenario1", "Scenario2" } },
+            new GasBoilersInfo("GB2", "Gas Boiler 2", true, 2.0, 540, 134, 1.08) { Scenarios = new List<string> { "Scenario1", "Scenario2" } },
+            new GasBoilersInfo("GB3", "Gas Boiler 3", true, 4.0, 580, 136, 1.09) { Scenarios = new List<string> { "Scenario1" } },
+            new OilBoilerInfo("OB1", "Oil Boiler 1", true, 6.0, 690, 147, 1.18) { Scenarios = new List<string> { "Scenario1" } },
+            new GasMotorInfo("GM1", "Gas Motor 1", true, 5.3, 3.9, 975, 227, 1.82) { Scenarios = new List<string> { "Scenario2" } },
+            new ElectricBoilerInfo("EB1", "Electric Boiler 1", true, 6.0, -6.0, 15) { Scenarios = new List<string> { "Scenario2" } }
+        };
+    }
+
+    private static List<ScenarioData> GetDefaultScenarios()
+    {
+        return new List<ScenarioData>
+        {
+            new ScenarioData
+            {
+                Name = "Scenario1",
+                DisplayName = "Scenario 1",
+                Units = new List<string> { "GB1", "GB2", "GB3", "OB1" },
+                MaintenanceUnits = new Dictionary<string, string>
+                {
+                    { "Winter", "OB1" },
+                    { "Summer", "GB3" }
+                }
+            },
+            new ScenarioData
+            {
+                Name = "Scenario2",
+                DisplayName = "Scenario 2",
+                Units = new List<string> { "GB1", "GB2", "GM1", "EB1" },
+                MaintenanceUnits = new Dictionary<string, string>
+                {
+                    { "Winter", "GM1" },
+                    { "Summer", "EB1" }
+                }
+            }
         };
     }
 }

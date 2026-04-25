@@ -201,17 +201,25 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
 
     private void RunOptimization()
     {
-        var result = optimizerService.Optimize(selectedObjective, selectedSeason, selectedScenario);
-        resultDataManager.AddResult(result);
+        try
+        {
+            var result = optimizerService.Optimize(selectedObjective, selectedSeason, selectedScenario);
+            resultDataManager.AddResult(result);
 
-        OptimizationSummary =
-            $"Selected: {FormatObjective(selectedObjective)}, {selectedSeason}, {FormatScenario(selectedScenario)} | " +
-            $"Points: {result.Timeline.Count} | Heat: {result.TotalHeat:F1} MWh | Cost: {result.TotalCost:F1} | CO2: {result.TotalCo2:F1} | Net el.: {result.NetElectricity:F1} MWh";
+            OptimizationSummary =
+                $"Selected: {FormatObjective(selectedObjective)}, {selectedSeason}, {FormatScenario(selectedScenario)} | " +
+                $"Points: {result.Timeline.Count} | Heat: {result.TotalHeat:F1} MWh | Cost: {result.TotalCost:F1} | CO2: {result.TotalCo2:F1} | Net el.: {result.NetElectricity:F1} MWh";
 
-        LastOptimizationMessage = result.StatusMessage;
+            LastOptimizationMessage = result.StatusMessage;
 
-        // Refresh visualization for the new result
-        SelectedResult = result;
+            // Refresh visualization for the new result
+            SelectedResult = result;
+        }
+        catch (Exception ex)
+        {
+            LastOptimizationMessage = $"Error during optimization: {ex.Message}";
+            System.Diagnostics.Debug.WriteLine($"RunOptimization error: {ex}");
+        }
     }
 
     private void UpdateSummaryFromSelection()
@@ -508,22 +516,17 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
 
     private string[] GetScenarioUnitOrderedShortNames(OptimizationResult.ScenarioOption scenario)
     {
-        // Get all available units from asset manager, ordered by scenario preference
-        var allUnits = assetManagerViewModel.Units
-            .Where(u => u.IsAvailable)
+        var scenarioName = scenario.ToString();
+
+        var scenarioUnits = assetManagerViewModel.Units
+            .Where(u => u.IsAvailable && u.Scenarios != null && u.Scenarios.Any(s =>
+                s.Equals("all", StringComparison.OrdinalIgnoreCase) ||
+                s.Equals(scenarioName, StringComparison.OrdinalIgnoreCase)))
             .Select(u => u.ShortName)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            .OrderBy(x => x)
+            .ToArray();
 
-        var preferredUnits = scenario == OptimizationResult.ScenarioOption.Scenario1
-            ? new[] { "GB1", "GB2", "GB3", "OB1" }
-            : new[] { "GB1", "GB2", "GM1", "EB1" };
-
-        // Return preferred units first, then any additional custom units
-        var ordered = preferredUnits.Where(allUnits.Contains).ToList();
-        var customUnits = allUnits.Except(preferredUnits).OrderBy(x => x);
-        ordered.AddRange(customUnits);
-
-        return ordered.ToArray();
+        return scenarioUnits;
     }
 
     private SKColor GetUnitColor(string shortName)

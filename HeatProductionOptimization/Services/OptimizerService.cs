@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HeatProductionOptimization.Models;
+using HeatProductionOptimization.Services;
 using AssetUnit = global::ProductionUnit;
 using SourceRow = global::Data;
 
@@ -184,17 +185,19 @@ public class OptimizerService
             : sourceManager.GetSummerData();
     }
 
-    private static HashSet<string> GetScenarioUnitShortNames(
+    private HashSet<string> GetScenarioUnitShortNames(
         OptimizationResult.ScenarioOption scenario)
     {
-        // Scenario 1: three gas boilers + one oil boiler.
-        if (scenario == OptimizationResult.ScenarioOption.Scenario1)
-        {
-            return new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "GB1", "GB2", "GB3", "OB1" };
-        }
+        var scenarioName = scenario.ToString();
 
-        // Scenario 2: two gas boilers + one gas motor + one electric boiler.
-        return new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "GB1", "GB2", "GM1", "EB1" };
+        var units = assetManager.Units
+            .Where(u => u.Scenarios != null && u.Scenarios.Any(s =>
+                s.Equals("all", StringComparison.OrdinalIgnoreCase) ||
+                s.Equals(scenarioName, StringComparison.OrdinalIgnoreCase)))
+            .Select(u => u.ShortName)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        return units.Any() ? units : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     }
 
     private static string BuildScenarioSummary(
@@ -207,12 +210,10 @@ public class OptimizerService
             ? $"{maintenanceWindow.UnitShortName} ({maintenanceWindow.DurationHours}h)"
             : "none";
 
-        return scenario == OptimizationResult.ScenarioOption.Scenario1
-            ? $"Units: {units} (3 gas boilers + 1 oil boiler) | Maintenance: {maintenanceText}"
-            : $"Units: {units} (2 gas boilers + 1 gas motor + 1 electric boiler) | Maintenance: {maintenanceText}";
+        return $"Units: {units} | Maintenance: {maintenanceText}";
     }
 
-    private static MaintenanceWindow? BuildMaintenanceWindow(
+    private MaintenanceWindow? BuildMaintenanceWindow(
         IReadOnlyList<SourceRow> sourceRows,
         OptimizationResult.SeasonOption season,
         OptimizationResult.ScenarioOption scenario,
@@ -232,7 +233,11 @@ public class OptimizerService
         // Place maintenance around the middle of the period.
         var startIndex = Math.Min(maxStartIndex, Math.Max(0, (hoursInPeriod - effectiveHours) / 2));
 
-        var maintenanceUnit = GetMaintenanceUnitShortName(season, scenario, scenarioUnitShortNames);
+        var scenarioName = scenario.ToString();
+        var scenarioData = assetManager.Scenarios
+            .FirstOrDefault(s => s.Name.Equals(scenarioName, StringComparison.OrdinalIgnoreCase));
+
+        var maintenanceUnit = GetMaintenanceUnitShortName(season, scenarioUnitShortNames, scenarioData);
         if (string.IsNullOrWhiteSpace(maintenanceUnit))
         {
             return null;
@@ -246,20 +251,13 @@ public class OptimizerService
 
     private static string GetMaintenanceUnitShortName(
         OptimizationResult.SeasonOption season,
-        OptimizationResult.ScenarioOption scenario,
-        HashSet<string> scenarioUnitShortNames)
+        HashSet<string> scenarioUnitShortNames,
+        ScenarioData? scenarioData)
     {
-        // One obligatory maintenance unit per season, with deterministic assignment.
-        var preferred = scenario switch
-        {
-            OptimizationResult.ScenarioOption.Scenario1 =>
-                season == OptimizationResult.SeasonOption.Winter ? "OB1" : "GB3",
-            OptimizationResult.ScenarioOption.Scenario2 =>
-                season == OptimizationResult.SeasonOption.Winter ? "GM1" : "EB1",
-            _ => null
-        };
-
-        if (!string.IsNullOrWhiteSpace(preferred) && scenarioUnitShortNames.Contains(preferred))
+        if (scenarioData != null
+            && scenarioData.MaintenanceUnits.TryGetValue(season.ToString(), out var preferred)
+            && !string.IsNullOrWhiteSpace(preferred)
+            && scenarioUnitShortNames.Contains(preferred))
         {
             return preferred;
         }

@@ -1,0 +1,82 @@
+[
+  {
+    "type": "GasBoiler",
+    "shortName": "GB1",
+    "name": "Gas Boiler 1",
+    "isAvailable": true,
+    "maxHeat": 3,
+    "productionCosts": 510,
+    "co2Emissions": 132,
+    "gasConsumption": 1.05,
+    "scenarios": [
+      "Scenario1",
+      "Scenario2"
+    ]
+  },
+  {
+    "type": "GasBoiler",
+    "shortName": "GB2",
+    "name": "Gas Boiler 2",
+    "isAvailable": true,
+    "maxHeat": 2,
+    "productionCosts": 540,
+    "co2Emissions": 134,
+    "gasConsumption": 1.08,
+    "scenarios": [
+      "Scenario1",
+      "Scenario2"
+    ]
+  },
+  {
+    "type": "GasBoiler",
+    "shortName": "GB3",
+    "name": "Gas Boiler 3",
+    "isAvailable": true,
+    "maxHeat": 4,
+    "productionCosts": 580,
+    "co2Emissions": 136,
+    "gasConsumption": 1.09,
+    "scenarios": [
+      "Scenario1"
+    ]
+  },
+  {
+    "type": "OilBoiler",
+    "shortName": "OB1",
+    "name": "Oil Boiler 1",
+    "isAvailable": true,
+    "maxHeat": 6,
+    "productionCosts": 690,
+    "co2Emissions": 147,
+    "oilConsumption": 1.18,
+    "scenarios": [
+      "Scenario1"
+    ]
+  },
+  {
+    "type": "GasMotor",
+    "shortName": "GM1",
+    "name": "Gas Motor 1",
+    "isAvailable": true,
+    "maxHeat": 5.3,
+    "productionCosts": 975,
+    "co2Emissions": 227,
+    "gas2Consumption": 1.82,
+    "maxElectricity": 3.9,
+    "scenarios": [
+      "Scenario2"
+    ]
+  },
+  {
+    "type": "ElectricBoiler",
+    "shortName": "EB1",
+    "name": "Electric Boiler 1",
+    "isAvailable": true,
+    "maxHeat": 6,
+    "productionCosts": 15,
+    "maxElectricity": -6,
+    "scenarios": [
+      "Scenario2"
+    ]
+  }
+]

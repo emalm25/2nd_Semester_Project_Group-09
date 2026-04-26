@@ -23,8 +23,7 @@ public class ProductionUnit
     public double MaxHeat {get; set;}
     public decimal ProductionCosts {get; set;}
     public double? CO2Emissions {get; set;}
-    public List<string> Scenarios {get; set;} = new() { "all" };
-
+    
     public virtual double? GasConsumption { get; set; } = null;
     public virtual double? OilConsumption { get; set; } = null;
     public virtual double? Gas2Consumption { get; set; } = null;
@@ -93,30 +92,17 @@ public class AssetManager
     private readonly UnitConfigurationService _configService;
 
     public List<ProductionUnit> Units { get; }
-    public List<ScenarioData> Scenarios { get; }
 
     public AssetManager()
     {
         _configService = new UnitConfigurationService();
         Units = _configService.LoadUnits();
-        Scenarios = _configService.LoadScenarios();
     }
 
     public void SaveUnits()
     {
         _configService.SaveUnits(Units);
     }
-
-    public void SaveScenarios()
-    {
-        _configService.SaveScenarios(Scenarios);
-    }
 }
 
     
-
-
-
-
-
-

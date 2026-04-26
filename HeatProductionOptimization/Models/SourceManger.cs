@@ -20,21 +20,21 @@ public class Data
         this.HeatDemand = HeatDemand;
         this.ElectricityPrice = ElectricityPrice;
     }
-  
+
 
 }
   public class SourceManager
     {
         public List<Data> GetWinterData()
         {
-            var winterPath = Path.Combine(AppContext.BaseDirectory, "SourceWinterData.csv");
-            return Csvreader.CSVReadHandle(winterPath);
+            var winterPath = Path.Combine(AppContext.BaseDirectory, "SourceWinterData.json");
+            return JsonReader.JsonReadHandle(winterPath);
         }
 
         public List<Data> GetSummerData()
         {
-            var summerPath = Path.Combine(AppContext.BaseDirectory, "SourceSummerData.csv");
-            return Csvreader.CSVReadHandle(summerPath);
+            var summerPath = Path.Combine(AppContext.BaseDirectory, "SourceSummerData.json");
+            return JsonReader.JsonReadHandle(summerPath);
         }
-        
+
     }

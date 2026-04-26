@@ -108,7 +108,6 @@ public class OptimizationResult
         get => TotalHeat;
         set { }
     }
-
     public double CO2Emissions
     {
         get => TotalCo2;

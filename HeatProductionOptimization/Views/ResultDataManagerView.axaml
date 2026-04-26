@@ -9,10 +9,10 @@
         <StackPanel Margin="20" Spacing="10">
             <TextBlock Text="Result Manager" FontSize="22" FontWeight="Bold" />
             <StackPanel Orientation="Horizontal" Spacing="10">
-            <Button Content="Save" Command="{Binding SaveCommand}" Foreground="White"/>
-            <Button Content="Load" Command="{Binding LoadCommand}" Foreground="White"/>
-            <Button Content="Remove selected" Command="{Binding RemoveSelectedCommand}" Foreground="White"/>
-            <Button Content="Clear all" Command="{Binding ClearAllCommand}" Foreground="White"/>
+            <Button Content="Save" Command="{Binding SaveCommand}" Background="#d94545" Foreground="White"/>
+            <Button Content="Load" Command="{Binding LoadCommand}" Background="#d94545" Foreground="White"/>
+            <Button Content="Remove selected" Command="{Binding RemoveSelectedCommand}" Background="#d94545" Foreground="White"/>
+            <Button Content="Clear all" Command="{Binding ClearAllCommand}" Background="#d94545" Foreground="White"/>
         </StackPanel>  
         <TextBlock Text="{Binding StatusMessage}" />
             <ListBox ItemsSource="{Binding Results}" SelectedItem="{Binding SelectedResult}">

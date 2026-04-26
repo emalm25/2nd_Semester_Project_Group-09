@@ -127,13 +127,13 @@
                                     </StackPanel>
 
                                     <!-- CO2 Emissions -->
-                                    <StackPanel>
+                                    <StackPanel IsVisible="{Binding CO2Emissions, Converter={x:Static ObjectConverters.IsNotNull}}">
                                         <TextBlock Text="CO₂ Emissions:" FontSize="12" Padding="0,0,0,3"/>
                                         <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding $parent[UserControl].DataContext.IsEditMode}">
                                             <TextBox Text="{Binding CO2Emissions, Mode=TwoWay}" Width="80" Background="#1A1A1A" Foreground="White" BorderBrush="#555" Padding="5"/>
                                             <TextBlock Text="kg/MWh" VerticalAlignment="Center" FontSize="12"/>
                                         </StackPanel>
-                                        <TextBlock IsVisible="{Binding !$parent[UserControl].DataContext.IsEditMode}" Text="{Binding CO2Emissions, StringFormat={}{0} kg / MWh(th), TargetNullValue=None}" FontSize="15" FontWeight="SemiBold"/>
+                                        <TextBlock IsVisible="{Binding !$parent[UserControl].DataContext.IsEditMode}" Text="{Binding CO2Emissions, StringFormat={}{0} kg / MWh(th)}" FontSize="15" FontWeight="SemiBold"/>
                                     </StackPanel>
 
                                     <!-- Gas Consumption -->

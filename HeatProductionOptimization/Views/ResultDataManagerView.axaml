@@ -29,7 +29,6 @@
                 <TextBlock Text="{Binding Expenses, StringFormat='Expenses: {0:F1}'}"/>
                 <TextBlock Text="{Binding Profit, StringFormat='Profit: {0:F1}'}"/>
                 <TextBlock Text="{Binding PrimaryEnergyConsumption, StringFormat='Primary energy consumption: {0:F1}'}"/>
-                <TextBlock Text="{Binding CO2Emissions, StringFormat='CO2 emissions: {0:F1}'}"/>
 
 </StackPanel>
 </Border>

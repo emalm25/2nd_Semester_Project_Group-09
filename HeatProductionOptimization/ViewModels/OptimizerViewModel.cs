@@ -30,9 +30,11 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
 
     private OptimizationResult.ObjectiveType selectedObjective = OptimizationResult.ObjectiveType.Cost;
     private OptimizationResult.SeasonOption selectedSeason = OptimizationResult.SeasonOption.Winter;
+    private OptimizationResult.SeasonOption selectedMaintenanceSeason = OptimizationResult.SeasonOption.Summer;
     private OptimizationResult.ScenarioOption selectedScenario = OptimizationResult.ScenarioOption.Scenario1;
 
-    private string optimizationSummary = "Current setup: Cost, Winter, Scenario 1";
+    private string optimizationSummary = "Current setup: Cost, Winter, Scenario 1, Maintenance Summer";
+    private string maintenanceInfoText = string.Empty;
     private string lastOptimizationMessage = "Ready to optimize.";
     private ISeries[] netProductionCostSeries = Array.Empty<ISeries>();
     private Axis[] netProductionCostXAxes = Array.Empty<Axis>();
@@ -62,6 +64,7 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
 
         SetObjectiveCommand = new RelayCommand<string>(SetObjective);
         SetSeasonCommand = new RelayCommand<string>(SetSeason);
+        SetMaintenanceSeasonCommand = new RelayCommand<string>(SetMaintenanceSeason);
         SetScenarioCommand = new RelayCommand<string>(SetScenario);
         OptimizeCommand = new RelayCommand(RunOptimization);
 
@@ -85,6 +88,9 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
 
     public bool IsWinterSelected => selectedSeason == OptimizationResult.SeasonOption.Winter;
     public bool IsSummerSelected => selectedSeason == OptimizationResult.SeasonOption.Summer;
+
+    public bool IsMaintenanceWinterSelected => selectedMaintenanceSeason == OptimizationResult.SeasonOption.Winter;
+    public bool IsMaintenanceSummerSelected => selectedMaintenanceSeason == OptimizationResult.SeasonOption.Summer;
 
     public bool IsScenario1Selected => selectedScenario == OptimizationResult.ScenarioOption.Scenario1;
     public bool IsScenario2Selected => selectedScenario == OptimizationResult.ScenarioOption.Scenario2;
@@ -122,6 +128,12 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
         private set => SetProperty(ref optimizationSummary, value);
     }
 
+    public string MaintenanceInfoText
+    {
+        get => maintenanceInfoText;
+        private set => SetProperty(ref maintenanceInfoText, value);
+    }
+
     public string LastOptimizationMessage
     {
         get => lastOptimizationMessage;
@@ -130,6 +142,7 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
 
     public IRelayCommand<string> SetObjectiveCommand { get; }
     public IRelayCommand<string> SetSeasonCommand { get; }
+    public IRelayCommand<string> SetMaintenanceSeasonCommand { get; }
     public IRelayCommand<string> SetScenarioCommand { get; }
     public IRelayCommand OptimizeCommand { get; }
 
@@ -183,6 +196,22 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
         UpdateSummaryFromSelection();
     }
 
+    private void SetMaintenanceSeason(string? season)
+    {
+        if (string.IsNullOrWhiteSpace(season))
+        {
+            return;
+        }
+
+        selectedMaintenanceSeason = season.Trim().Equals("Summer", StringComparison.OrdinalIgnoreCase)
+            ? OptimizationResult.SeasonOption.Summer
+            : OptimizationResult.SeasonOption.Winter;
+
+        OnPropertyChanged(nameof(IsMaintenanceWinterSelected));
+        OnPropertyChanged(nameof(IsMaintenanceSummerSelected));
+        UpdateSummaryFromSelection();
+    }
+
     private void SetScenario(string? scenario)
     {
         if (string.IsNullOrWhiteSpace(scenario))
@@ -201,12 +230,16 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
 
     private void RunOptimization()
     {
-        var result = optimizerService.Optimize(selectedObjective, selectedSeason, selectedScenario);
+        var result = optimizerService.Optimize(selectedObjective, selectedSeason, selectedScenario, selectedMaintenanceSeason);
         resultDataManager.AddResult(result);
 
         OptimizationSummary =
-            $"Selected: {FormatObjective(selectedObjective)}, {selectedSeason}, {FormatScenario(selectedScenario)} | " +
+            $"Selected: {FormatObjective(selectedObjective)}, {FormatSeason(selectedSeason)}, {FormatScenario(selectedScenario)}, Maintenance {FormatSeason(selectedMaintenanceSeason)} | " +
             $"Points: {result.Timeline.Count} | Heat: {result.TotalHeat:F1} MWh | Cost: {result.TotalCost:F1} | CO2: {result.TotalCo2:F1} | Net el.: {result.NetElectricity:F1} MWh";
+        
+        MaintenanceInfoText = result.MaintenanceHours > 0
+            ? $"Unit in maintenance: {result.MaintenanceUnit} ({result.MaintenanceHours}h)"
+            : $"Unit in maintenance: {result.MaintenanceUnit}";
 
         LastOptimizationMessage = result.StatusMessage;
 
@@ -217,7 +250,8 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
     private void UpdateSummaryFromSelection()
     {
         OptimizationSummary =
-            $"Current setup: {FormatObjective(selectedObjective)}, {selectedSeason}, {FormatScenario(selectedScenario)}";
+            $"Current setup: {FormatObjective(selectedObjective)}, {FormatSeason(selectedSeason)}, {FormatScenario(selectedScenario)}, Maintenance {FormatSeason(selectedMaintenanceSeason)}";
+        MaintenanceInfoText = string.Empty;
     }
 
     private static string FormatObjective(OptimizationResult.ObjectiveType objective)
@@ -228,6 +262,11 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
     private static string FormatScenario(OptimizationResult.ScenarioOption scenario)
     {
         return scenario == OptimizationResult.ScenarioOption.Scenario2 ? "Scenario 2" : "Scenario 1";
+    }
+
+    private static string FormatSeason(OptimizationResult.SeasonOption season)
+    {
+        return season == OptimizationResult.SeasonOption.Summer ? "Summer" : "Winter";
     }
 
     // Data Visualization methods

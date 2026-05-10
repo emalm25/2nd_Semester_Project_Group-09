@@ -47,6 +47,8 @@ public class OptimizationResult
 
     public string SummaryMessage { get; set; } = string.Empty;
     public string StatusMessage { get; set; } = string.Empty;
+    public string MaintenanceUnit { get; set; } = string.Empty;
+    public int MaintenanceHours { get; set; } = 0;
 
     // Legacy fields kept for existing Result Data Manager bindings.
     public string Minimalize

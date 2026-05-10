@@ -46,7 +46,7 @@
 				<Setter Property="BorderThickness" Value="1"/>
 				<Setter Property="CornerRadius" Value="6"/>
 				<Setter Property="Padding" Value="10"/>
-				<Setter Property="Width" Value="190"/>
+				<Setter Property="Width" Value="170"/>
 			</Style>
 			<Style Selector="Border.barCell">
 				<Setter Property="Width" Value="48"/>
@@ -65,6 +65,7 @@
 
 	<ScrollViewer Classes="optimizer-scroll" VerticalScrollBarVisibility="Auto">
 		<StackPanel Margin="18" Spacing="14">
+			<!-- Optimization Controls Section -->
 			<TextBlock Text="Optimization Criteria" FontSize="22" FontWeight="SemiBold" Foreground="White"/>
 			<TextBlock Text="Select one option in each category, then run the optimizer." Foreground="#D0D0D0"/>
 
@@ -86,6 +87,14 @@
 						</StackPanel>
 					</StackPanel>
 
+					<StackPanel Spacing="8" Margin="0,0,16,0">
+						<TextBlock Text="Maintenance" FontSize="16" FontWeight="SemiBold"/>
+						<StackPanel Orientation="Horizontal" Spacing="10">
+							<Button Content="Winter" Classes="option" Classes.selected="{Binding IsMaintenanceWinterSelected}" Command="{Binding SetMaintenanceSeasonCommand}" CommandParameter="Winter"/>
+							<Button Content="Summer" Classes="option" Classes.selected="{Binding IsMaintenanceSummerSelected}" Command="{Binding SetMaintenanceSeasonCommand}" CommandParameter="Summer"/>
+						</StackPanel>
+					</StackPanel>
+
 					<StackPanel Spacing="8">
 						<TextBlock Text="Scenario" FontSize="16" FontWeight="SemiBold"/>
 						<StackPanel Orientation="Horizontal" Spacing="10">
@@ -97,6 +106,7 @@
 			</Border>
 
 			<TextBlock Text="{Binding OptimizationSummary}" Foreground="#E2E2E2" FontStyle="Italic"/>
+			<TextBlock Text="{Binding MaintenanceInfoText}" Foreground="#E2E2E2" FontStyle="Italic"/>
 
 			<Button Content="Optimize" Classes="primaryAction" HorizontalAlignment="Left" Command="{Binding OptimizeCommand}"/>
 
@@ -188,18 +198,17 @@
 									<StackPanel Orientation="Horizontal"/>
 								</ItemsPanelTemplate>
 							</ItemsControl.ItemsPanel>
-
 							<ItemsControl.ItemTemplate>
 								<DataTemplate>
-									<Border Background="#232323" BorderBrush="#3D3D3D" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,10,0" Width="220">
+									<Border Background="#232323" BorderBrush="#3D3D3D" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,10,0" Width="230" HorizontalAlignment="Left">
 										<StackPanel Spacing="4">
 											<TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
-											<TextBlock Text="{Binding ShortName}" Foreground="#C0C0C0" FontSize="11"/>
-											<TextBlock Text="{Binding IsActive, StringFormat='Active: {0}'}" Foreground="{Binding StatusBrush}" FontSize="11"/>
-											<TextBlock Text="{Binding MaxHeat, StringFormat='Max: {0:F1} MW'}" FontSize="11"/>
-											<TextBlock Text="{Binding CostPerMWh, StringFormat='Cost: {0:F1}'}" FontSize="11"/>
-											<TextBlock Text="{Binding Co2PerMWh, StringFormat='CO2: {0:F1}'}" FontSize="11" IsVisible="{Binding ShowCo2}"/>
-											<TextBlock Text="{Binding ElectricityPerHeatMWh, StringFormat='Elec: {0:F2}'}" FontSize="11"/>
+											<TextBlock Text="{Binding ShortName}" Foreground="#C0C0C0"/>
+											<TextBlock Text="{Binding IsActive, StringFormat='Active: {0}'}" Foreground="{Binding StatusBrush}"/>
+											<TextBlock Text="{Binding MaxHeat, StringFormat='Max heat: {0:F1}'}"/>
+											<TextBlock Text="{Binding CostPerMWh, StringFormat='Cost/MWh: {0:F1}'}"/>
+											<TextBlock Text="{Binding Co2PerMWh, StringFormat='CO2/MWh: {0:F1}'}"/>
+											<TextBlock Text="{Binding ElectricityPerHeatMWh, StringFormat='Elec/Heat: {0:F2}'}"/>
 										</StackPanel>
 									</Border>
 								</DataTemplate>
@@ -256,7 +265,7 @@
 										<TextBlock Text="{Binding HeatProduced, StringFormat='Heat: {0:F1} MWh'}" Width="150"/>
 										<TextBlock Text="{Binding NetCost, StringFormat='Cost: {0:F1} DKK'}" Width="170"/>
 										<TextBlock Text="{Binding NetCostPerMWh, StringFormat='Net cost: {0:F1} DKK/MWh'}" Width="210"/>
-									<TextBlock Text="{Binding Co2, StringFormat='CO2: {0:F1} kg'}" Width="120" IsVisible="{Binding ShowCo2}"/>
+										<TextBlock Text="{Binding Co2, StringFormat='CO2: {0:F1} kg'}" Width="120"/>
 									</StackPanel>
 								</Border>
 							</DataTemplate>
@@ -268,4 +277,3 @@
 	</ScrollViewer>
 
 </UserControl>
-

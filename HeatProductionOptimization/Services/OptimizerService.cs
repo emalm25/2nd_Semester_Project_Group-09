@@ -23,11 +23,12 @@ public class OptimizerService
     public OptimizationResult Optimize(
         OptimizationResult.ObjectiveType objective,
         OptimizationResult.SeasonOption season,
-        OptimizationResult.ScenarioOption scenario)
+        OptimizationResult.ScenarioOption scenario,
+        OptimizationResult.SeasonOption maintenanceSeason)
     {
         var sourceRows = LoadSourceRows(season);
         var scenarioUnitShortNames = GetScenarioUnitShortNames(scenario);
-        var maintenanceWindow = BuildMaintenanceWindow(sourceRows, season, scenario, scenarioUnitShortNames);
+        var maintenanceWindow = BuildMaintenanceWindow(sourceRows, season, maintenanceSeason, scenario, scenarioUnitShortNames);
 
         var scenarioUnits = assetManager.Units
             .Select((unit, index) => new
@@ -169,8 +170,10 @@ public class OptimizerService
             .ToList();
 
         result.StatusMessage = "Optimization completed.";
+        result.MaintenanceUnit = maintenanceWindow?.UnitShortName ?? "None";
+        result.MaintenanceHours = maintenanceWindow?.DurationHours ?? 0;
 
-        var scenarioSummary = BuildScenarioSummary(scenario, scenarioUnitShortNames, maintenanceWindow);
+        var scenarioSummary = BuildScenarioSummary(scenario, scenarioUnitShortNames, maintenanceSeason, maintenanceWindow);
         result.SummaryMessage =
             $"Objective: {objective} | Season: {season} | Scenario: {scenario} | {scenarioSummary}";
 
@@ -200,6 +203,7 @@ public class OptimizerService
     private static string BuildScenarioSummary(
         OptimizationResult.ScenarioOption scenario,
         HashSet<string> scenarioUnitShortNames,
+        OptimizationResult.SeasonOption maintenanceSeason,
         MaintenanceWindow? maintenanceWindow)
     {
         var units = string.Join(", ", scenarioUnitShortNames.OrderBy(name => name));
@@ -208,16 +212,23 @@ public class OptimizerService
             : "none";
 
         return scenario == OptimizationResult.ScenarioOption.Scenario1
-            ? $"Units: {units} (3 gas boilers + 1 oil boiler) | Maintenance: {maintenanceText}"
-            : $"Units: {units} (2 gas boilers + 1 gas motor + 1 electric boiler) | Maintenance: {maintenanceText}";
+            ? $"Units: {units} (3 gas boilers + 1 oil boiler) | Maintenance season: {maintenanceSeason} | Maintenance: {maintenanceText}"
+            : $"Units: {units} (2 gas boilers + 1 gas motor + 1 electric boiler) | Maintenance season: {maintenanceSeason} | Maintenance: {maintenanceText}";
     }
 
     private static MaintenanceWindow? BuildMaintenanceWindow(
         IReadOnlyList<SourceRow> sourceRows,
         OptimizationResult.SeasonOption season,
+        OptimizationResult.SeasonOption maintenanceSeason,
         OptimizationResult.ScenarioOption scenario,
         HashSet<string> scenarioUnitShortNames)
     {
+        // Only apply maintenance if the maintenance season matches the optimization season
+        if (maintenanceSeason != season)
+        {
+            return null;
+        }
+
         var windowHours = Math.Clamp(DefaultMaintenanceHours, 30, 60);
         if (sourceRows.Count == 0)
         {
@@ -232,7 +243,7 @@ public class OptimizerService
         // Place maintenance around the middle of the period.
         var startIndex = Math.Min(maxStartIndex, Math.Max(0, (hoursInPeriod - effectiveHours) / 2));
 
-        var maintenanceUnit = GetMaintenanceUnitShortName(season, scenario, scenarioUnitShortNames);
+        var maintenanceUnit = GetMaintenanceUnitShortName(maintenanceSeason, scenario, scenarioUnitShortNames);
         if (string.IsNullOrWhiteSpace(maintenanceUnit))
         {
             return null;
@@ -245,7 +256,7 @@ public class OptimizerService
     }
 
     private static string GetMaintenanceUnitShortName(
-        OptimizationResult.SeasonOption season,
+        OptimizationResult.SeasonOption maintenanceSeason,
         OptimizationResult.ScenarioOption scenario,
         HashSet<string> scenarioUnitShortNames)
     {
@@ -253,9 +264,9 @@ public class OptimizerService
         var preferred = scenario switch
         {
             OptimizationResult.ScenarioOption.Scenario1 =>
-                season == OptimizationResult.SeasonOption.Winter ? "OB1" : "GB3",
+                maintenanceSeason == OptimizationResult.SeasonOption.Winter ? "OB1" : "GB3",
             OptimizationResult.ScenarioOption.Scenario2 =>
-                season == OptimizationResult.SeasonOption.Winter ? "GM1" : "EB1",
+                maintenanceSeason == OptimizationResult.SeasonOption.Winter ? "GM1" : "EB1",
             _ => null
         };
 

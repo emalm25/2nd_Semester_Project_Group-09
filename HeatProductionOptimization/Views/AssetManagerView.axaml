@@ -5,176 +5,186 @@
     x:DataType="vm:AssetManagerViewModel"
     x:Class="HeatProductionOptimization.Views.AssetManagerView">
 
-    <StackPanel>
-        <!-- Header with Edit Mode Toggle -->
-        <Grid ColumnDefinitions="*,Auto" Margin="18,18,18,0" ColumnSpacing="15">
-            <TextBlock Grid.Column="0" Text="Asset manager information" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center"/>
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                <TextBlock Text="Edit Mode:" VerticalAlignment="Center" FontSize="14"/>
-                <ToggleSwitch IsChecked="{Binding IsEditMode, Mode=TwoWay}" OnContent="ON" OffContent="OFF">
-                    <ToggleSwitch.Styles>
-                        <Style Selector="ToggleSwitch:checked /template/ Border#SwitchKnobBounds">
-                            <Setter Property="Background" Value="#d94545"/>
-                        </Style>
-                        <Style Selector="ToggleSwitch:unchecked /template/ Border#OuterBorder">
-                            <Setter Property="Background" Value="#252525"/>
-                            <Setter Property="BorderBrush" Value="#252525"/>
-                        </Style>
-                    </ToggleSwitch.Styles>
-                </ToggleSwitch>
+
+    <UserControl.Styles>
+        <!-- Style override for TextBox -->
+        <Style Selector="TextBox">
+            <Setter Property="Background" Value="#1A1A1A"/>
+            <Setter Property="CaretBrush" Value="White"/>
+        </Style>
+        <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+            <Setter Property="BorderBrush" Value="#d94545"/>
+        </Style>
+        <Style Selector="TextBox /template/ Border">
+            <Setter Property="Background" Value="#2E2E2E"/>
+        </Style>
+
+        <!-- Style override for ToggleSwitch -->
+        <Style Selector="ToggleSwitch:checked /template/ Border">
+            <Setter Property="Background" Value="#d94545"/>
+        </Style>
+        <Style Selector="ToggleSwitch:unchecked /template/ Border">
+            <Setter Property="Background" Value="#252525"/>
+            <Setter Property="BorderBrush" Value="#252525"/>
+        </Style>
+
+        <!-- Style override for ScrollViewer -->
+        <Style Selector="ScrollViewer.asset-scroll ScrollBar /template/ Thumb">
+            <Setter Property="Background" Value="#d94545"/>
+        </Style>
+        <Style Selector="ScrollViewer.asset-scroll ScrollBar /template/ Rectangle#TrackRect">
+            <Setter Property="Fill" Value="#2E2E2E"/>
+            <Setter Property="Opacity" Value="0"/>
+        </Style>
+    </UserControl.Styles>
+
+    <ScrollViewer Classes="asset-scroll"  AllowAutoHide="True" VerticalScrollBarVisibility="Visible" Margin="18,0,18,0">
+
+        <StackPanel>
+            <!-- Header with Edit Mode Toggle -->
+            <Grid ColumnDefinitions="*,Auto" Margin="18,18,18,0" ColumnSpacing="15" >
+                <TextBlock Grid.Column="0" Text="Asset manager information" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                <Border Grid.Column="1" Background="#2E2E2E" BorderThickness="2" CornerRadius="5" Padding="10">
+                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <TextBlock Text="Edit Mode:" VerticalAlignment="Center" FontSize="14"/>
+                    <ToggleSwitch IsChecked="{Binding IsEditMode, Mode=TwoWay}" OnContent="ON" OffContent="OFF" Foreground="White"/>
+                </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Add Unit Buttons (visible in edit mode) -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="18,10,18,0" IsVisible="{Binding IsEditMode}">
+                <Button Content="+ Gas Boiler" Background="#d94545" Command="{Binding AddNewUnitCommand}" CommandParameter="GasBoiler" Padding="10,5" Foreground="White"/>
+                <Button Content="+ Oil Boiler" Background="#d94545" Command="{Binding AddNewUnitCommand}" CommandParameter="OilBoiler" Padding="10,5" Foreground="White"/>
+                <Button Content="+ Gas Motor" Background="#d94545" Command="{Binding AddNewUnitCommand}" CommandParameter="GasMotor" Padding="10,5" Foreground="White"/>
+                <Button Content="+ Electric Boiler" Background="#d94545" Command="{Binding AddNewUnitCommand}" CommandParameter="ElectricBoiler" Padding="10,5" Foreground="White"/>
             </StackPanel>
-        </Grid>
 
-        <!-- Add Unit Buttons (visible in edit mode) -->
-        <StackPanel Orientation="Horizontal" Spacing="10" Margin="18,10,18,0" IsVisible="{Binding IsEditMode}">
-            <Button Content="+ Gas Boiler" Background="#d94545" Command="{Binding AddNewUnitCommand}" CommandParameter="GasBoiler" Padding="10,5" Foreground="White"/>
-            <Button Content="+ Oil Boiler" Background="#d94545" Command="{Binding AddNewUnitCommand}" CommandParameter="OilBoiler" Padding="10,5" Foreground="White"/>
-            <Button Content="+ Gas Motor" Background="#d94545" Command="{Binding AddNewUnitCommand}" CommandParameter="GasMotor" Padding="10,5" Foreground="White"/>
-            <Button Content="+ Electric Boiler" Background="#d94545" Command="{Binding AddNewUnitCommand}" CommandParameter="ElectricBoiler" Padding="10,5" Foreground="White"/>
-        </StackPanel>
+            <!-- Units List -->
+            <ScrollViewer Classes="asset-scroll" AllowAutoHide="True" HorizontalScrollBarVisibility="Visible" VerticalAlignment="Top" Margin="0,18,0,18">
 
-        <!-- Units List -->
-        <ScrollViewer Classes="asset-scroll" AllowAutoHide="True" HorizontalScrollBarVisibility="Visible" VerticalAlignment="Top" Padding="0" Margin="0,15,0,0">
-            <ScrollViewer.Styles>
-                <Style Selector="ScrollViewer.asset-scroll ScrollBar /template/ Thumb">
-                    <Setter Property="Background" Value="#d94545"/>
-                </Style>
-                <Style Selector="ScrollViewer.asset-scroll ScrollBar /template/ Rectangle#TrackRect">
-                    <Setter Property="Fill" Value="#2E2E2E"/>
-                    <Setter Property="Opacity" Value="0"/>
-                </Style>
-            </ScrollViewer.Styles>
 
-            <ItemsControl ItemsSource="{Binding Units}" Margin="20,20,20,36">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal" Spacing="20"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
+                <ItemsControl ItemsSource="{Binding Units}" Margin="20,20,20,36">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="20"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
 
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate x:CompileBindings="False">
-                        <Border Background="#2E2E2E" BorderThickness="2" BorderBrush="#d94545" CornerRadius="5" MinWidth="260" Padding="15" VerticalAlignment="Top">
-                            <StackPanel Spacing="12">
-                                <!-- Image -->
-                                <Border BorderThickness="10" CornerRadius="3" Background="#d94545" HorizontalAlignment="Center">
-                                    <Image Source="{Binding Image}" Width="150" Height="138" Stretch="Uniform"/>
-                                </Border>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:CompileBindings="False">
+                            <Border Background="#2E2E2E" BorderThickness="2" BorderBrush="#d94545" CornerRadius="5" MinWidth="260" Padding="15" VerticalAlignment="Top">
+                                <StackPanel Spacing="12">
+                                    <!-- Image -->
+                                    <Border BorderThickness="10" CornerRadius="3" Background="#d94545" HorizontalAlignment="Center">
+                                        <Image Source="{Binding Image}" Width="150" Height="138" Stretch="Uniform"/>
+                                    </Border>
 
-                                <!-- Unit Header -->
-                                <Border BorderThickness="0,0,0,2" BorderBrush="#d94545" Padding="0,0,0,10">
-                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10" HorizontalAlignment="Stretch">
-                                        <StackPanel Grid.Column="0" Spacing="5">
-                                            <!-- Edit Mode: Editable TextBoxes -->
-                                            <StackPanel IsVisible="{Binding $parent[UserControl].DataContext.IsEditMode}">
-                                                <TextBlock Text="Short Name:" FontSize="10" Foreground="#888"/>
-                                                <TextBox Text="{Binding ShortName, Mode=TwoWay}" FontSize="16" FontWeight="Bold" Background="#1A1A1A" Foreground="White" BorderBrush="#555" Padding="5"/>
-                                                <TextBlock Text="Full Name:" FontSize="10" Foreground="#888" Margin="0,5,0,0"/>
-                                                <TextBox Text="{Binding Name, Mode=TwoWay}" FontSize="12" Background="#1A1A1A" Foreground="White" BorderBrush="#555" Padding="5"/>
+                                    <!-- Unit Header -->
+                                    <Border BorderThickness="0,0,0,2" BorderBrush="#d94545" Padding="0,0,0,10">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10" HorizontalAlignment="Stretch">
+                                            <StackPanel Grid.Column="0" Spacing="5">
+                                                <!-- Edit Mode: Editable TextBoxes -->
+                                                <StackPanel IsVisible="{Binding $parent[UserControl].DataContext.IsEditMode}">
+                                                    <TextBlock Text="Short Name:" FontSize="10" Foreground="#888"/>
+                                                    <TextBox Text="{Binding ShortName, Mode=TwoWay}" FontSize="16" FontWeight="Bold" Foreground="White"/>
+                                                    <TextBlock Text="Full Name:" FontSize="10" Foreground="#888" Margin="0,5,0,0"/>
+                                                    <TextBox Text="{Binding Name, Mode=TwoWay}" FontSize="12" Foreground="White"/>
+                                                </StackPanel>
+
+                                                <!-- View Mode: Read-Only TextBlocks -->
+                                                <StackPanel IsVisible="{Binding !$parent[UserControl].DataContext.IsEditMode}">
+                                                    <TextBlock Text="{Binding ShortName}" FontSize="20" FontWeight="Bold"/>
+                                                    <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold"/>
+                                                </StackPanel>
                                             </StackPanel>
 
-                                            <!-- View Mode: Read-Only TextBlocks -->
-                                            <StackPanel IsVisible="{Binding !$parent[UserControl].DataContext.IsEditMode}">
-                                                <TextBlock Text="{Binding ShortName}" FontSize="20" FontWeight="Bold"/>
-                                                <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold"/>
+                                            <ToggleSwitch Grid.Column="1" IsChecked="{Binding IsAvailable, Mode=TwoWay}" OnContent="" OffContent="" HorizontalAlignment="Right"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Data Fields -->
+                                    <StackPanel Spacing="10">
+                                        <!-- Max Heat -->
+                                        <StackPanel>
+                                            <TextBlock Text="Max Heat:" FontSize="12" Padding="0,0,0,3"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding $parent[UserControl].DataContext.IsEditMode}">
+                                                <TextBox Text="{Binding MaxHeat, Mode=TwoWay}" Width="80" Foreground="White"/>
+                                                <TextBlock Text="MW" VerticalAlignment="Center" FontSize="12"/>
                                             </StackPanel>
+                                            <TextBlock IsVisible="{Binding !$parent[UserControl].DataContext.IsEditMode}" Text="{Binding MaxHeat, StringFormat={}{0:F1} MW}" FontSize="15" FontWeight="SemiBold"/>
                                         </StackPanel>
 
-                                        <ToggleSwitch Grid.Column="1" IsChecked="{Binding IsAvailable, Mode=TwoWay}" OnContent="" OffContent="" HorizontalAlignment="Right">
-                                            <ToggleSwitch.Styles>
-                                                <Style Selector="ToggleSwitch:checked /template/ Border#SwitchKnobBounds">
-                                                    <Setter Property="Background" Value="#d94545"/>
-                                                </Style>
-                                                <Style Selector="ToggleSwitch:unchecked /template/ Border#OuterBorder">
-                                                    <Setter Property="Background" Value="#252525"/>
-                                                    <Setter Property="BorderBrush" Value="#252525"/>
-                                                </Style>
-                                            </ToggleSwitch.Styles>
-                                        </ToggleSwitch>
-                                    </Grid>
-                                </Border>
-
-                                <!-- Data Fields -->
-                                <StackPanel Spacing="10">
-                                    <!-- Max Heat -->
-                                    <StackPanel>
-                                        <TextBlock Text="Max Heat:" FontSize="12" Padding="0,0,0,3"/>
-                                        <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding $parent[UserControl].DataContext.IsEditMode}">
-                                            <TextBox Text="{Binding MaxHeat, Mode=TwoWay}" Width="80" Background="#1A1A1A" Foreground="White" BorderBrush="#555" Padding="5"/>
-                                            <TextBlock Text="MW" VerticalAlignment="Center" FontSize="12"/>
+                                        <!-- Max Electricity (if available) -->
+                                        <StackPanel IsVisible="{Binding MaxElectricity, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                            <TextBlock Text="Max Electricity:" FontSize="12" Padding="0,0,0,3"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding $parent[UserControl].DataContext.IsEditMode}">
+                                                <TextBox Text="{Binding MaxElectricity, Mode=TwoWay}" Width="80" Foreground="White"/>
+                                                <TextBlock Text="MW" VerticalAlignment="Center" FontSize="12"/>
+                                            </StackPanel>
+                                            <TextBlock IsVisible="{Binding !$parent[UserControl].DataContext.IsEditMode}" Text="{Binding MaxElectricity, StringFormat={}{0:F1} MW}" FontSize="15" FontWeight="SemiBold"/>
                                         </StackPanel>
-                                        <TextBlock IsVisible="{Binding !$parent[UserControl].DataContext.IsEditMode}" Text="{Binding MaxHeat, StringFormat={}{0:F1} MW}" FontSize="15" FontWeight="SemiBold"/>
+
+                                        <!-- Production Costs -->
+                                        <StackPanel>
+                                            <TextBlock Text="Production Costs:" FontSize="12" Padding="0,0,0,3"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding $parent[UserControl].DataContext.IsEditMode}">
+                                                <TextBox Text="{Binding ProductionCosts, Mode=TwoWay}" Width="80" Foreground="White"/>
+                                                <TextBlock Text="DKK/MWh" VerticalAlignment="Center" FontSize="12"/>
+                                            </StackPanel>
+                                            <TextBlock IsVisible="{Binding !$parent[UserControl].DataContext.IsEditMode}" Text="{Binding ProductionCosts, StringFormat={}{0} DKK / MWh(th)}" FontSize="15" FontWeight="SemiBold"/>
+                                        </StackPanel>
+
+                                        <!-- CO2 Emissions -->
+                                        <StackPanel IsVisible="{Binding CO2Emissions, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                            <TextBlock Text="CO₂ Emissions:" FontSize="12" Padding="0,0,0,3"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding $parent[UserControl].DataContext.IsEditMode}">
+                                                <TextBox Text="{Binding CO2Emissions, Mode=TwoWay}" Width="80" Foreground="White"/>
+                                                <TextBlock Text="kg/MWh" VerticalAlignment="Center" FontSize="12"/>
+                                            </StackPanel>
+                                            <TextBlock IsVisible="{Binding !$parent[UserControl].DataContext.IsEditMode}" Text="{Binding CO2Emissions, StringFormat={}{0} kg / MWh(th)}" FontSize="15" FontWeight="SemiBold"/>
+                                        </StackPanel>
+
+                                        <!-- Gas Consumption -->
+                                        <StackPanel IsVisible="{Binding GasConsumption, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                            <TextBlock Text="Gas Consumption:" FontSize="12" Padding="0,0,0,3"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding $parent[UserControl].DataContext.IsEditMode}">
+                                                <TextBox Text="{Binding GasConsumption, Mode=TwoWay}" Width="80" Foreground="White"/>
+                                                <TextBlock Text="MWh/MWh" VerticalAlignment="Center" FontSize="12"/>
+                                            </StackPanel>
+                                            <TextBlock IsVisible="{Binding !$parent[UserControl].DataContext.IsEditMode}" Text="{Binding GasConsumption, StringFormat={}{0:F2} MWh(gas) / MWh(th)}" FontSize="15" FontWeight="SemiBold"/>
+                                        </StackPanel>
+
+                                        <!-- Oil Consumption -->
+                                        <StackPanel IsVisible="{Binding OilConsumption, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                            <TextBlock Text="Oil Consumption:" FontSize="12" Padding="0,0,0,3"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding $parent[UserControl].DataContext.IsEditMode}">
+                                                <TextBox Text="{Binding OilConsumption, Mode=TwoWay}" Width="80" Foreground="White"/>
+                                                <TextBlock Text="MWh/MWh" VerticalAlignment="Center" FontSize="12"/>
+                                            </StackPanel>
+                                            <TextBlock IsVisible="{Binding !$parent[UserControl].DataContext.IsEditMode}" Text="{Binding OilConsumption, StringFormat={}{0:F2} MWh(oil) / MWh(th)}" FontSize="15" FontWeight="SemiBold"/>
+                                        </StackPanel>
+
+                                        <!-- Gas Motor Consumption -->
+                                        <StackPanel IsVisible="{Binding Gas2Consumption, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                            <TextBlock Text="Gas Consumption:" FontSize="12" Padding="0,0,0,3"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding $parent[UserControl].DataContext.IsEditMode}">
+                                                <TextBox Text="{Binding Gas2Consumption, Mode=TwoWay}" Width="80" Foreground="White"/>
+                                                <TextBlock Text="MWh/MWh" VerticalAlignment="Center" FontSize="12"/>
+                                            </StackPanel>
+                                            <TextBlock IsVisible="{Binding !$parent[UserControl].DataContext.IsEditMode}" Text="{Binding Gas2Consumption, StringFormat={}{0:F2} MWh(gas) / MWh(th)}" FontSize="15" FontWeight="SemiBold"/>
+                                        </StackPanel>
                                     </StackPanel>
 
-                                    <!-- Max Electricity (if available) -->
-                                    <StackPanel IsVisible="{Binding MaxElectricity, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                        <TextBlock Text="Max Electricity:" FontSize="12" Padding="0,0,0,3"/>
-                                        <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding $parent[UserControl].DataContext.IsEditMode}">
-                                            <TextBox Text="{Binding MaxElectricity, Mode=TwoWay}" Width="80" Background="#1A1A1A" Foreground="White" BorderBrush="#555" Padding="5"/>
-                                            <TextBlock Text="MW" VerticalAlignment="Center" FontSize="12"/>
-                                        </StackPanel>
-                                        <TextBlock IsVisible="{Binding !$parent[UserControl].DataContext.IsEditMode}" Text="{Binding MaxElectricity, StringFormat={}{0:F1} MW}" FontSize="15" FontWeight="SemiBold"/>
-                                    </StackPanel>
-
-                                    <!-- Production Costs -->
-                                    <StackPanel>
-                                        <TextBlock Text="Production Costs:" FontSize="12" Padding="0,0,0,3"/>
-                                        <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding $parent[UserControl].DataContext.IsEditMode}">
-                                            <TextBox Text="{Binding ProductionCosts, Mode=TwoWay}" Width="80" Background="#1A1A1A" Foreground="White" BorderBrush="#555" Padding="5"/>
-                                            <TextBlock Text="DKK/MWh" VerticalAlignment="Center" FontSize="12"/>
-                                        </StackPanel>
-                                        <TextBlock IsVisible="{Binding !$parent[UserControl].DataContext.IsEditMode}" Text="{Binding ProductionCosts, StringFormat={}{0} DKK / MWh(th)}" FontSize="15" FontWeight="SemiBold"/>
-                                    </StackPanel>
-
-                                    <!-- CO2 Emissions -->
-                                    <StackPanel IsVisible="{Binding CO2Emissions, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                        <TextBlock Text="CO₂ Emissions:" FontSize="12" Padding="0,0,0,3"/>
-                                        <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding $parent[UserControl].DataContext.IsEditMode}">
-                                            <TextBox Text="{Binding CO2Emissions, Mode=TwoWay}" Width="80" Background="#1A1A1A" Foreground="White" BorderBrush="#555" Padding="5"/>
-                                            <TextBlock Text="kg/MWh" VerticalAlignment="Center" FontSize="12"/>
-                                        </StackPanel>
-                                        <TextBlock IsVisible="{Binding !$parent[UserControl].DataContext.IsEditMode}" Text="{Binding CO2Emissions, StringFormat={}{0} kg / MWh(th)}" FontSize="15" FontWeight="SemiBold"/>
-                                    </StackPanel>
-
-                                    <!-- Gas Consumption -->
-                                    <StackPanel IsVisible="{Binding GasConsumption, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                        <TextBlock Text="Gas Consumption:" FontSize="12" Padding="0,0,0,3"/>
-                                        <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding $parent[UserControl].DataContext.IsEditMode}">
-                                            <TextBox Text="{Binding GasConsumption, Mode=TwoWay}" Width="80" Background="#1A1A1A" Foreground="White" BorderBrush="#555" Padding="5"/>
-                                            <TextBlock Text="MWh/MWh" VerticalAlignment="Center" FontSize="12"/>
-                                        </StackPanel>
-                                        <TextBlock IsVisible="{Binding !$parent[UserControl].DataContext.IsEditMode}" Text="{Binding GasConsumption, StringFormat={}{0:F2} MWh(gas) / MWh(th)}" FontSize="15" FontWeight="SemiBold"/>
-                                    </StackPanel>
-
-                                    <!-- Oil Consumption -->
-                                    <StackPanel IsVisible="{Binding OilConsumption, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                        <TextBlock Text="Oil Consumption:" FontSize="12" Padding="0,0,0,3"/>
-                                        <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding $parent[UserControl].DataContext.IsEditMode}">
-                                            <TextBox Text="{Binding OilConsumption, Mode=TwoWay}" Width="80" Background="#1A1A1A" Foreground="White" BorderBrush="#555" Padding="5"/>
-                                            <TextBlock Text="MWh/MWh" VerticalAlignment="Center" FontSize="12"/>
-                                        </StackPanel>
-                                        <TextBlock IsVisible="{Binding !$parent[UserControl].DataContext.IsEditMode}" Text="{Binding OilConsumption, StringFormat={}{0:F2} MWh(oil) / MWh(th)}" FontSize="15" FontWeight="SemiBold"/>
-                                    </StackPanel>
-
-                                    <!-- Gas Motor Consumption -->
-                                    <StackPanel IsVisible="{Binding Gas2Consumption, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                        <TextBlock Text="Gas Consumption:" FontSize="12" Padding="0,0,0,3"/>
-                                        <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding $parent[UserControl].DataContext.IsEditMode}">
-                                            <TextBox Text="{Binding Gas2Consumption, Mode=TwoWay}" Width="80" Background="#1A1A1A" Foreground="White" BorderBrush="#555" Padding="5"/>
-                                            <TextBlock Text="MWh/MWh" VerticalAlignment="Center" FontSize="12"/>
-                                        </StackPanel>
-                                        <TextBlock IsVisible="{Binding !$parent[UserControl].DataContext.IsEditMode}" Text="{Binding Gas2Consumption, StringFormat={}{0:F2} MWh(gas) / MWh(th)}" FontSize="15" FontWeight="SemiBold"/>
-                                    </StackPanel>
+                                    <!-- Delete Button (visible in edit mode) -->
+                                    <Button IsVisible="{Binding $parent[UserControl].DataContext.IsEditMode}" Content="Delete Unit" HorizontalContentAlignment="Center" Background="#d94545" HorizontalAlignment="Stretch" Padding="10,8" Foreground="White" Command="{Binding $parent[UserControl].DataContext.DeleteUnitCommand}" CommandParameter="{Binding .}"/>
                                 </StackPanel>
-
-                                <!-- Delete Button (visible in edit mode) -->
-                                <Button IsVisible="{Binding $parent[UserControl].DataContext.IsEditMode}" Content="Delete Unit" Background="#8B0000" HorizontalAlignment="Stretch" Padding="10,8" Foreground="White" Command="{Binding $parent[UserControl].DataContext.DeleteUnitCommand}" CommandParameter="{Binding .}"/>
-                            </StackPanel>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
-    </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </StackPanel>
+    </ScrollViewer>
 
 </UserControl>

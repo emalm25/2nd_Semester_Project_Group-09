@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Avalonia.Media;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using HeatProductionOptimization.Models;
 using HeatProductionOptimization.Services;
@@ -656,11 +657,13 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
 
     private void RefreshIfNeeded(object? state)
     {
-        if (SelectedResult != null && assetManagerViewModel.IsEditMode)
+        Dispatcher.UIThread.Post(() =>
         {
-            // Auto-refresh optimizer when editing units
-            RunOptimization();
-        }
+            if (SelectedResult != null && assetManagerViewModel.IsEditMode)
+            {
+                BuildProductionUnitSettings();
+            }
+        });
     }
 
     public void Dispose()

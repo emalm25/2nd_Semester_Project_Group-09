@@ -344,8 +344,8 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
         SummaryMetrics.Add(new MetricCardViewModel("Heat production", totalProduced, "MWh", Brushes.SeaGreen));
         SummaryMetrics.Add(new MetricCardViewModel("Electricity production", totalElectricityProduced, "MWh", Brushes.Gold));
         SummaryMetrics.Add(new MetricCardViewModel("Electricity consumption", totalElectricityConsumed, "MWh", Brushes.OrangeRed));
-        SummaryMetrics.Add(new MetricCardViewModel("Electricity price", averageElectricityPrice, "€/MWh", Brushes.MediumPurple));
-        SummaryMetrics.Add(new MetricCardViewModel("Expenses", SelectedResult.TotalCost, "€", Brushes.CornflowerBlue));
+        SummaryMetrics.Add(new MetricCardViewModel("Electricity price", averageElectricityPrice, "DKK/MWh", Brushes.MediumPurple));
+        SummaryMetrics.Add(new MetricCardViewModel("Expenses", SelectedResult.TotalCost, "DKK", Brushes.CornflowerBlue));
         SummaryMetrics.Add(new MetricCardViewModel("Primary energy", SelectedResult.PrimaryEnergyConsumption, "MWh", Brushes.DarkCyan));
 
         foreach (var row in BuildPriorityRanking(SelectedResult))
@@ -384,111 +384,141 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
 
     private void BuildNetProductionCostChart()
     {
-        if (SelectedResult == null || SelectedResult.Timeline.Count == 0)
+        try
         {
-            NetProductionCostSeries = Array.Empty<ISeries>();
-            NetProductionCostXAxes = Array.Empty<Axis>();
-            NetProductionCostYAxes = Array.Empty<Axis>();
-            MainChartLegendItems.Clear();
-            return;
-        }
-
-        var points = SelectedResult.Timeline.ToList();
-
-        if (points.Count == 0)
-        {
-            NetProductionCostSeries = Array.Empty<ISeries>();
-            NetProductionCostXAxes = Array.Empty<Axis>();
-            NetProductionCostYAxes = Array.Empty<Axis>();
-            MainChartLegendItems.Clear();
-            return;
-        }
-
-        var labels = points
-            .Select(point => point.StartTime.Hour % LabelIntervalHours == 0
-                ? FormatTimestampLabel(point.StartTime)
-                : string.Empty)
-            .ToArray();
-
-        var scenarioUnitShortNames = GetScenarioUnitOrderedShortNames(SelectedResult.ScenarioType);
-        var availableUnitNames = assetManagerViewModel.Units
-            .Where(unit => unit.IsAvailable)
-            .Select(unit => unit.ShortName)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-        var series = new List<ISeries>();
-        MainChartLegendItems.Clear();
-
-        foreach (var unitShortName in scenarioUnitShortNames.Where(availableUnitNames.Contains))
-        {
-            var unitColor = GetUnitColor(unitShortName);
-            var unitValues = points
-                .Select(point =>
+            if (SelectedResult == null || SelectedResult.Timeline.Count == 0)
+            {
+                Dispatcher.UIThread.Post(() =>
                 {
-                    var unitDispatch = point.Dispatches
-                        .Where(dispatch => dispatch.UnitName == unitShortName)
-                        .Sum(dispatch => dispatch.HeatProduced);
+                    NetProductionCostSeries = Array.Empty<ISeries>();
+                    NetProductionCostXAxes = Array.Empty<Axis>();
+                    NetProductionCostYAxes = Array.Empty<Axis>();
+                    MainChartLegendItems.Clear();
+                });
 
-                    return unitDispatch;
-                })
+                return;
+            }
+
+            var points = SelectedResult.Timeline.ToList();
+
+            if (points.Count == 0)
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    NetProductionCostSeries = Array.Empty<ISeries>();
+                    NetProductionCostXAxes = Array.Empty<Axis>();
+                    NetProductionCostYAxes = Array.Empty<Axis>();
+                    MainChartLegendItems.Clear();
+                });
+
+                return;
+            }
+
+            var labels = points
+                .Select(point => point.StartTime.Hour % LabelIntervalHours == 0
+                    ? FormatTimestampLabel(point.StartTime)
+                    : string.Empty)
                 .ToArray();
 
-            series.Add(new StackedColumnSeries<double>
+            var scenarioUnitShortNames = GetScenarioUnitOrderedShortNames(SelectedResult.ScenarioType);
+            var availableUnitNames = assetManagerViewModel.Units
+                .Where(unit => unit.IsAvailable)
+                .Select(unit => unit.ShortName)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            var series = new List<ISeries>();
+            var legendItems = new List<ChartLegendItemViewModel>();
+
+            foreach (var unitShortName in scenarioUnitShortNames.Where(availableUnitNames.Contains))
             {
-                Name = unitShortName,
-                Values = unitValues,
-                Fill = new SolidColorPaint(unitColor),
-                Stroke = null
+                var unitColor = GetUnitColor(unitShortName);
+                var unitValues = points
+                    .Select(point =>
+                    {
+                        var unitDispatch = point.Dispatches
+                            .Where(dispatch => dispatch.UnitName == unitShortName)
+                            .Sum(dispatch => dispatch.HeatProduced);
+
+                        return unitDispatch;
+                    })
+                    .ToArray();
+
+                series.Add(new StackedColumnSeries<double>
+                {
+                    Name = unitShortName,
+                    Values = unitValues,
+                    Fill = new SolidColorPaint(unitColor),
+                    Stroke = null
+                });
+
+                legendItems.Add(new ChartLegendItemViewModel(
+                    unitShortName,
+                    new SolidColorBrush(Color.FromArgb(unitColor.Alpha, unitColor.Red, unitColor.Green, unitColor.Blue))));
+            }
+
+            var demandColor = new SKColor(217, 69, 69);
+            var demandValues = points.Select(point => point.HeatDemand).ToArray();
+            series.Add(new LineSeries<double>
+            {
+                Name = "Heat Demand",
+                Values = demandValues,
+                Stroke = new SolidColorPaint(demandColor) { StrokeThickness = 3 },
+                Fill = null,
+                GeometrySize = 0,
+                LineSmoothness = 1,
+                GeometryFill = null,
+                GeometryStroke = null
             });
 
-            MainChartLegendItems.Add(new ChartLegendItemViewModel(
-                unitShortName,
-                new SolidColorBrush(Color.FromArgb(unitColor.Alpha, unitColor.Red, unitColor.Green, unitColor.Blue))));
+            legendItems.Add(new ChartLegendItemViewModel(
+                "Heat Demand",
+                new SolidColorBrush(Color.FromArgb(demandColor.Alpha, demandColor.Red, demandColor.Green, demandColor.Blue))));
+
+            // Assign on UI thread to avoid Skia/LiveCharts threading issues
+            Dispatcher.UIThread.Post(() =>
+            {
+                try
+                {
+                    NetProductionCostSeries = series.ToArray();
+                    NetProductionCostXAxes = new Axis[]
+                    {
+                        new Axis
+                        {
+                            Labels = labels,
+                            LabelsRotation = 45,
+                            TextSize = 11,
+                            LabelsPaint = new SolidColorPaint(SKColors.White),
+                            NamePaint = new SolidColorPaint(SKColors.White),
+                            Name = "Time"
+                        }
+                    };
+
+                    NetProductionCostYAxes = new Axis[]
+                    {
+                        new Axis
+                        {
+                            Name = "Heat Produced (MWh)",
+                            MinLimit = 0,
+                            TextSize = 11,
+                            LabelsPaint = new SolidColorPaint(SKColors.White),
+                            NamePaint = new SolidColorPaint(SKColors.White)
+                        }
+                    };
+
+                    MainChartLegendItems.Clear();
+                    foreach (var li in legendItems)
+                        MainChartLegendItems.Add(li);
+                }
+                catch (Exception ex)
+                {
+                    try { System.IO.File.AppendAllText("chart-errors.log", DateTime.Now + " - UI assign error: " + ex + "\n"); } catch {}
+                }
+            });
         }
-
-        var demandColor = new SKColor(217, 69, 69);
-        var demandValues = points.Select(point => point.HeatDemand).ToArray();
-        series.Add(new LineSeries<double>
+        catch (Exception ex)
         {
-            Name = "Heat Demand",
-            Values = demandValues,
-            Stroke = new SolidColorPaint(demandColor) { StrokeThickness = 3 },
-            Fill = null,
-            GeometrySize = 0,
-            LineSmoothness = 1,
-            GeometryFill = null,
-            GeometryStroke = null
-        });
-
-        MainChartLegendItems.Add(new ChartLegendItemViewModel(
-            "Heat Demand",
-            new SolidColorBrush(Color.FromArgb(demandColor.Alpha, demandColor.Red, demandColor.Green, demandColor.Blue))));
-
-        NetProductionCostSeries = series.ToArray();
-        NetProductionCostXAxes = new Axis[]
-        {
-            new Axis
-            {
-                Labels = labels,
-                LabelsRotation = 45,
-                TextSize = 11,
-                LabelsPaint = new SolidColorPaint(SKColors.White),
-                NamePaint = new SolidColorPaint(SKColors.White),
-                Name = "Time"
-            }
-        };
-        
-        NetProductionCostYAxes = new Axis[]
-        {
-            new Axis
-            {
-                Name = "Heat Produced (MWh)",
-                MinLimit = 0,
-                TextSize = 11,
-                LabelsPaint = new SolidColorPaint(SKColors.White),
-                NamePaint = new SolidColorPaint(SKColors.White)
-            }
-        };
+            try { System.IO.File.AppendAllText("chart-errors.log", DateTime.Now + " - BuildNetProductionCostChart error: " + ex + "\n"); } catch {}
+        }
     }
 
     private static void BuildElectricityBalanceSeries(

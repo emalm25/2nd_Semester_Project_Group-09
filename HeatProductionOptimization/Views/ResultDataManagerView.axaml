@@ -5,36 +5,176 @@
     x:Class="HeatProductionOptimization.Views.ResultDataManagerView"
     x:DataType="vm:ResultDataManagerViewModel">
 
-    <ScrollViewer>
+    <UserControl.Styles>
+        <Styles>
+            <!-- Local ListBox appearance for Result Data Manager -->
+            <Style Selector="ListBox">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+                            <ScrollViewer Name="PART_ScrollViewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                                <ItemsPresenter />
+                            </ScrollViewer>
+                        </Border>
+                    </ControlTemplate>
+                </Setter>
+            </Style>
+
+            <!-- Base item styling with custom template to remove theme focus border -->
+            <Style Selector="ListBoxItem">
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="BorderBrush" Value="#d94545"/>
+                <Setter Property="Background" Value="#2E2E2E"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Padding" Value="10"/>
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <Border Name="root" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter>
+            </Style>
+
+            <!-- Template-level overrides: target template elements that draw selection visuals -->
+            <Style Selector="ListBoxItem:selected /template/ Border">
+                <Setter Property="Background" Value="#d94545"/>
+                <Setter Property="BorderBrush" Value="#d94545"/>
+            </Style>
+
+            <Style Selector="ListBoxItem:selected /template/ Rectangle">
+                <Setter Property="Fill" Value="#d94545"/>
+            </Style>
+
+            <!-- Common template part names (no-op if not present) -->
+            <Style Selector="ListBoxItem:selected /template/ Border#PART_BorderElement">
+                <Setter Property="Background" Value="#d94545"/>
+                <Setter Property="BorderBrush" Value="#d94545"/>
+            </Style>
+            <Style Selector="ListBoxItem:selected /template/ Rectangle#Selection">
+                <Setter Property="Fill" Value="#d94545"/>
+            </Style>
+
+            <!-- Hover and focus variations -->
+            <Style Selector="ListBoxItem:pointerover /template/ Border">
+                <Setter Property="Background" Value="#b83b3b"/>
+            </Style>
+            <Style Selector="ListBoxItem:selected:pointerover /template/ Border">
+                <Setter Property="Background" Value="#b83b3b"/>
+            </Style>
+            <!-- Stronger overrides to catch focus/focus-ring from theme -->
+            <Style Selector="ListBoxItem:focused /template/ Border">
+                <Setter Property="Background" Value="#d94545"/>
+                <Setter Property="BorderBrush" Value="#d94545"/>
+            </Style>
+            <Style Selector="ListBoxItem:focus /template/ Border">
+                <Setter Property="Background" Value="#d94545"/>
+                <Setter Property="BorderBrush" Value="#d94545"/>
+            </Style>
+            <Style Selector="ListBox:focused /template/ Border">
+                <Setter Property="BorderBrush" Value="#d94545"/>
+            </Style>
+
+            <!-- Ensure item content text is visible when selected -->
+            <Style Selector="Border.selected TextBlock">
+                <Setter Property="Foreground" Value="White"/>
+            </Style>
+
+            <Style Selector="ListBoxItem:selected">
+                <Setter Property="Background" Value="#8f2f2f"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="BorderBrush" Value="#8f2f2f"/>
+            </Style>
+            <!-- Target possible template parts that draw the blue focus/selection outline -->
+            <Style Selector="ListBox /template/ Border#PART_BorderElement">
+                <Setter Property="BorderBrush" Value="#d94545"/>
+            </Style>
+            <Style Selector="ListBox /template/ Border#Selection">
+                <Setter Property="BorderBrush" Value="#d94545"/>
+                <Setter Property="Background" Value="#d94545"/>
+            </Style>
+            <Style Selector="ListBox /template/ Rectangle#Selection">
+                <Setter Property="Fill" Value="#d94545"/>
+            </Style>
+            <Style Selector="ListBoxItem /template/ Rectangle#FocusVisual">
+                <Setter Property="Fill" Value="#d94545"/>
+            </Style>
+            <Style Selector="ListBoxItem /template/ Border#FocusVisual">
+                <Setter Property="BorderBrush" Value="#d94545"/>
+            </Style>
+            <Style Selector="ListBoxItem:selected /template/ Border#FocusVisual">
+                <Setter Property="BorderBrush" Value="#d94545"/>
+                <Setter Property="Background" Value="#d94545"/>
+            </Style>
+            <!-- Exhaustive child overrides to force red across all nested elements -->
+            <Style Selector="ListBoxItem:selected TextBlock">
+                <Setter Property="Foreground" Value="White"/>
+            </Style>
+            <Style Selector="ListBoxItem:selected Border">
+                <Setter Property="Background" Value="#d94545"/>
+                <Setter Property="BorderBrush" Value="#d94545"/>
+            </Style>
+            <Style Selector="ListBoxItem:selected Rectangle">
+                <Setter Property="Fill" Value="#d94545"/>
+            </Style>
+            <Style Selector="ListBoxItem:selected Path">
+                <Setter Property="Stroke" Value="#d94545"/>
+                <Setter Property="Fill" Value="#d94545"/>
+            </Style>
+            <!-- Removed broad Control/Panel/ContentPresenter setters (invalid on those types) -->
+            <Style Selector="ListBoxItem:pointerover TextBlock">
+                <Setter Property="Foreground" Value="White"/>
+            </Style>
+            <Style Selector="ListBoxItem:focused TextBlock">
+                <Setter Property="Foreground" Value="White"/>
+            </Style>
+        </Styles>
+    </UserControl.Styles>
+
+    <ScrollViewer Classes="results-scroll">
+        <ScrollViewer.Styles>
+            <!-- Style override for ScrollViewer -->
+            <Style Selector="ScrollViewer.results-scroll ScrollBar /template/ Thumb">
+                <Setter Property="Background" Value="#d94545"/>
+            </Style>
+            <Style Selector="ScrollViewer.results-scroll ScrollBar /template/ Rectangle#TrackRect">
+                <Setter Property="Fill" Value="#2E2E2E"/>
+                <Setter Property="Opacity" Value="0"/>
+            </Style>
+        </ScrollViewer.Styles>
+
         <StackPanel Margin="20" Spacing="10">
             <TextBlock Text="Result Manager" FontSize="22" FontWeight="Bold" />
             <StackPanel Orientation="Horizontal" Spacing="10">
-            <Button Content="Save" Command="{Binding SaveCommand}" Background="#d94545" Foreground="White"/>
-            <Button Content="Load" Command="{Binding LoadCommand}" Background="#d94545" Foreground="White"/>
-            <Button Content="Remove selected" Command="{Binding RemoveSelectedCommand}" Background="#d94545" Foreground="White"/>
-            <Button Content="Clear all" Command="{Binding ClearAllCommand}" Background="#d94545" Foreground="White"/>
-        </StackPanel>  
-        <TextBlock Text="{Binding StatusMessage}" />
-            <ListBox ItemsSource="{Binding Results}" SelectedItem="{Binding SelectedResult}">
+                <Button Content="Save" Command="{Binding SaveCommand}" Background="#d94545" Foreground="White"/>
+                <Button Content="Load" Command="{Binding LoadCommand}" Background="#d94545" Foreground="White"/>
+                <Button Content="Remove selected" Command="{Binding RemoveSelectedCommand}" Background="#d94545" Foreground="White"/>
+                <Button Content="Clear all" Command="{Binding ClearAllCommand}" Background="#d94545" Foreground="White"/>
+            </StackPanel>
+
+            <TextBlock Text="{Binding StatusMessage}" />
+
+            <ListBox Classes="listbox" ItemsSource="{Binding Results}" SelectedItem="{Binding SelectedResult}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border BorderBrush="Gray" BorderThickness="1" Padding="10" Margin="0,0,0,10">
-                <StackPanel Spacing="4">
-                <TextBlock Text="{Binding Minimalize, StringFormat='Minimalize: {0}'}"/>
-                <TextBlock Text="{Binding Season, StringFormat='Season: {0}'}"/>
-                <TextBlock Text="{Binding Scenario, StringFormat='Scenario: {0}'}"/>
-                <TextBlock Text="{Binding HeatProduction, StringFormat='Heat production: {0:F1}'}"/>
-                <TextBlock Text="{Binding ElectricityProduction, StringFormat='Electricity production: {0:F1}'}"/>
-                <TextBlock Text="{Binding ElectricityConsumption, StringFormat='Electricity consumption: {0:F1}'}"/>
-                <TextBlock Text="{Binding Expenses, StringFormat='Expenses: {0:F1}'}"/>
-                <TextBlock Text="{Binding Profit, StringFormat='Profit: {0:F1}'}"/>
-                <TextBlock Text="{Binding PrimaryEnergyConsumption, StringFormat='Primary energy consumption: {0:F1}'}"/>
-
-</StackPanel>
-</Border>
-</DataTemplate>
-</ListBox.ItemTemplate>
-</ListBox>
-</StackPanel>
-</ScrollViewer>
+                        <Border Classes.selected="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Padding="6">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{Binding Minimalize, StringFormat='Minimalize: {0}'}"/>
+                                <TextBlock Text="{Binding Season, StringFormat='Season: {0}'}"/>
+                                <TextBlock Text="{Binding Scenario, StringFormat='Scenario: {0}'}"/>
+                                <TextBlock Text="{Binding HeatProduction, StringFormat='Heat production: {0:F1} MWh'}"/>
+                                <TextBlock Text="{Binding ElectricityProduction, StringFormat='Electricity production: {0:F1} MWh'}"/>
+                                <TextBlock Text="{Binding ElectricityConsumption, StringFormat='Electricity consumption: {0:F1} MWh'}"/>
+                                <TextBlock Text="{Binding Expenses, StringFormat='Expenses: {0:F1} DKK'}"/>
+                                <TextBlock Text="{Binding Profit, StringFormat='Profit: {0:F1}  DKK'}"/>
+                                <TextBlock Text="{Binding PrimaryEnergyConsumption, StringFormat='Primary energy consumption: {0:F1} MWh'}"/>
+                                <TextBlock Text="{Binding CO2Emissions, StringFormat='CO₂ emissions: {0} kg'}"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

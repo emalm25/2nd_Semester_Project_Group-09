@@ -107,15 +107,15 @@
         <StackPanel Grid.Row="5"
                     Orientation="Horizontal"
                     Margin="10,5">
-            <TextBlock Text="{Binding AverageElectricityPrice, StringFormat='Avg: {0} €/MWh'}"
+            <TextBlock Text="{Binding AverageElectricityPrice, StringFormat='Avg: {0} DKK/MWh'}"
                        Foreground="#a0a0a0"
                        Margin="10,0"
                        FontSize="12"/>
-            <TextBlock Text="{Binding MinElectricityPrice, StringFormat='Min: {0} €/MWh'}"
+            <TextBlock Text="{Binding MinElectricityPrice, StringFormat='Min: {0} DKK/MWh'}"
                        Foreground="#a0a0a0"
                        Margin="10,0"
                        FontSize="12"/>
-            <TextBlock Text="{Binding MaxElectricityPrice, StringFormat='Max: {0} €/MWh'}"
+            <TextBlock Text="{Binding MaxElectricityPrice, StringFormat='Max: {0} DKK/MWh'}"
                        Foreground="#a0a0a0"
                        Margin="10,0"
                        FontSize="12"/>

@@ -41,7 +41,7 @@ public partial class ResultDataManagerViewModel : ObservableObject
     private void ClearAll()
     {
         resultDataManager.ClearResults();
-        StatusMessage = "All results cleared.";
+        StatusMessage = "All results removed.";
     }
 
     [RelayCommand]
@@ -55,6 +55,6 @@ public partial class ResultDataManagerViewModel : ObservableObject
     private void Load()
     {
         resultDataManager.LoadResults();
-        
+        StatusMessage = "Results loaded successfully.";
     }
 }

@@ -92,7 +92,7 @@
                                 </StackPanel>
                                 <StackPanel Spacing="4">
                                     <TextBlock Text="{Binding Expenses, StringFormat='Expenses: {0:F2} DKK'}"/>
-                                    <TextBlock Text="{Binding Profit, StringFormat='Profit: {0:F2}  DKK'}"/>
+                                    <TextBlock Text="{Binding Profit, StringFormat='Profit: {0:F2} DKK'}"/>
                                 </StackPanel>
                             </StackPanel>
                         </Border>

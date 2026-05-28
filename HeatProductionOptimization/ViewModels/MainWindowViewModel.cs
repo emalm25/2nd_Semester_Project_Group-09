@@ -1,5 +1,5 @@
-﻿namespace HeatProductionOptimization.ViewModels;
-using HeatProductionOptimization.Services;
+﻿using HeatProductionOptimization.Services;
+namespace HeatProductionOptimization.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {

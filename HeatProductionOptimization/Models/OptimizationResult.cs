@@ -50,7 +50,7 @@ public class OptimizationResult
     public string MaintenanceUnit { get; set; } = string.Empty;
     public int MaintenanceHours { get; set; } = 0;
 
-    // Legacy fields kept for existing Result Data Manager bindings.
+    
     public string Minimalize
     {
         get => Objective == ObjectiveType.CO2 ? "CO2" : "Cost";

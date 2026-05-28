@@ -1,4 +1,3 @@
-namespace HeatProductionOptimization.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,6 +8,8 @@ using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HeatProductionOptimization.Services;
+
+namespace HeatProductionOptimization.ViewModels;
 
 public class AssetManagerViewModel : ViewModelBase
 {

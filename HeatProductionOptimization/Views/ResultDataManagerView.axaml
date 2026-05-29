@@ -7,12 +7,11 @@
 
     <UserControl.Styles>
         <Styles>
-            <!-- Local ListBox appearance for Result Data Manager -->
             <Style Selector="ListBox">
                 <Setter Property="Background" Value="Transparent"/>
             </Style>
 
-            <!-- Base item styling with custom template to remove theme focus border -->
+         
             <Style Selector="ListBoxItem">
                 <Setter Property="BorderBrush" Value="Transparent"/>
                 <Setter Property="Background" Value="#2E2E2E"/>
@@ -27,7 +26,7 @@
                 </Setter>
             </Style>
 
-            <!-- Hover color change -->
+           
             <Style Selector="ListBoxItem:pointerover /template/ Border">
                 <Setter Property="Background" Value="#b83b3b"/>
             </Style>
@@ -35,7 +34,7 @@
                 <Setter Property="Foreground" Value="White"/>
             </Style>
 
-            <!-- Selected color change -->
+           
             <Style Selector="ListBoxItem:selected Border">
                 <Setter Property="Background" Value="#d94545"/>
                 <Setter Property="BorderBrush" Value="#d94545"/>

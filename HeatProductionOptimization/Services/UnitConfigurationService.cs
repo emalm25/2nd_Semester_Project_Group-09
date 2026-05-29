@@ -52,7 +52,7 @@ public class UnitConfigurationService
     {
         _configPath = Path.Combine(
             AppDomain.CurrentDomain.BaseDirectory,
-            "units-config.json"
+            "units.json"
         );
 
         _jsonOptions = new JsonSerializerOptions

@@ -384,141 +384,119 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
 
     private void BuildNetProductionCostChart()
     {
-        try
+        if (SelectedResult == null || SelectedResult.Timeline.Count == 0)
         {
-            if (SelectedResult == null || SelectedResult.Timeline.Count == 0)
-            {
-                Dispatcher.UIThread.Post(() =>
+            NetProductionCostSeries = Array.Empty<ISeries>();
+            NetProductionCostXAxes = Array.Empty<Axis>();
+            NetProductionCostYAxes = Array.Empty<Axis>();
+            MainChartLegendItems.Clear();
+            return;
+        }
+
+        var points = SelectedResult.Timeline.ToList();
+
+        if (points.Count == 0)
+        {
+            NetProductionCostSeries = Array.Empty<ISeries>();
+            NetProductionCostXAxes = Array.Empty<Axis>();
+            NetProductionCostYAxes = Array.Empty<Axis>();
+            MainChartLegendItems.Clear();
+            return;
+        }
+
+        var labels = points
+            .Select(point => point.StartTime.Hour % LabelIntervalHours == 0
+                ? FormatTimestampLabel(point.StartTime)
+                : string.Empty)
+            .ToArray();
+
+        var scenarioUnitShortNames = GetScenarioUnitOrderedShortNames(SelectedResult.ScenarioType);
+
+        var availableUnitNames = assetManagerViewModel.Units
+            .Where(unit => unit.IsAvailable)
+            .Select(unit => unit.ShortName)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var producedUnitNames = SelectedResult.DispatchesByUnit
+            .Where(d => d.HeatProduced > 0)
+            .Select(d => d.UnitName)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        // If we have scenario ordering, preserve that order but only include produced units
+
+        var series = new List<ISeries>();
+        MainChartLegendItems.Clear();
+
+        foreach (var unitShortName in scenarioUnitShortNames.Where(availableUnitNames.Contains).Where(n => producedUnitNames.Contains(n)))
+        {
+            var unitColor = GetUnitColor(unitShortName);
+            var unitValues = points
+                .Select(point =>
                 {
-                    NetProductionCostSeries = Array.Empty<ISeries>();
-                    NetProductionCostXAxes = Array.Empty<Axis>();
-                    NetProductionCostYAxes = Array.Empty<Axis>();
-                    MainChartLegendItems.Clear();
-                });
+                    var unitDispatch = point.Dispatches
+                        .Where(dispatch => dispatch.UnitName == unitShortName)
+                        .Sum(dispatch => dispatch.HeatProduced);
 
-                return;
-            }
-
-            var points = SelectedResult.Timeline.ToList();
-
-            if (points.Count == 0)
-            {
-                Dispatcher.UIThread.Post(() =>
-                {
-                    NetProductionCostSeries = Array.Empty<ISeries>();
-                    NetProductionCostXAxes = Array.Empty<Axis>();
-                    NetProductionCostYAxes = Array.Empty<Axis>();
-                    MainChartLegendItems.Clear();
-                });
-
-                return;
-            }
-
-            var labels = points
-                .Select(point => point.StartTime.Hour % LabelIntervalHours == 0
-                    ? FormatTimestampLabel(point.StartTime)
-                    : string.Empty)
+                    return unitDispatch;
+                })
                 .ToArray();
 
-            var scenarioUnitShortNames = GetScenarioUnitOrderedShortNames(SelectedResult.ScenarioType);
-            var availableUnitNames = assetManagerViewModel.Units
-                .Where(unit => unit.IsAvailable)
-                .Select(unit => unit.ShortName)
-                .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-            var series = new List<ISeries>();
-            var legendItems = new List<ChartLegendItemViewModel>();
-
-            foreach (var unitShortName in scenarioUnitShortNames.Where(availableUnitNames.Contains))
+            series.Add(new StackedColumnSeries<double>
             {
-                var unitColor = GetUnitColor(unitShortName);
-                var unitValues = points
-                    .Select(point =>
-                    {
-                        var unitDispatch = point.Dispatches
-                            .Where(dispatch => dispatch.UnitName == unitShortName)
-                            .Sum(dispatch => dispatch.HeatProduced);
-
-                        return unitDispatch;
-                    })
-                    .ToArray();
-
-                series.Add(new StackedColumnSeries<double>
-                {
-                    Name = unitShortName,
-                    Values = unitValues,
-                    Fill = new SolidColorPaint(unitColor),
-                    Stroke = null
-                });
-
-                legendItems.Add(new ChartLegendItemViewModel(
-                    unitShortName,
-                    new SolidColorBrush(Color.FromArgb(unitColor.Alpha, unitColor.Red, unitColor.Green, unitColor.Blue))));
-            }
-
-            var demandColor = new SKColor(217, 69, 69);
-            var demandValues = points.Select(point => point.HeatDemand).ToArray();
-            series.Add(new LineSeries<double>
-            {
-                Name = "Heat Demand",
-                Values = demandValues,
-                Stroke = new SolidColorPaint(demandColor) { StrokeThickness = 3 },
-                Fill = null,
-                GeometrySize = 0,
-                LineSmoothness = 1,
-                GeometryFill = null,
-                GeometryStroke = null
+                Name = unitShortName,
+                Values = unitValues,
+                Fill = new SolidColorPaint(unitColor),
+                Stroke = null
             });
 
-            legendItems.Add(new ChartLegendItemViewModel(
-                "Heat Demand",
-                new SolidColorBrush(Color.FromArgb(demandColor.Alpha, demandColor.Red, demandColor.Green, demandColor.Blue))));
-
-            // Assign on UI thread to avoid Skia/LiveCharts threading issues
-            Dispatcher.UIThread.Post(() =>
-            {
-                try
-                {
-                    NetProductionCostSeries = series.ToArray();
-                    NetProductionCostXAxes = new Axis[]
-                    {
-                        new Axis
-                        {
-                            Labels = labels,
-                            LabelsRotation = 45,
-                            TextSize = 11,
-                            LabelsPaint = new SolidColorPaint(SKColors.White),
-                            NamePaint = new SolidColorPaint(SKColors.White),
-                            Name = "Time"
-                        }
-                    };
-
-                    NetProductionCostYAxes = new Axis[]
-                    {
-                        new Axis
-                        {
-                            Name = "Heat Produced (MWh)",
-                            MinLimit = 0,
-                            TextSize = 11,
-                            LabelsPaint = new SolidColorPaint(SKColors.White),
-                            NamePaint = new SolidColorPaint(SKColors.White)
-                        }
-                    };
-
-                    MainChartLegendItems.Clear();
-                    foreach (var li in legendItems)
-                        MainChartLegendItems.Add(li);
-                }
-                catch (Exception ex)
-                {
-                    try { System.IO.File.AppendAllText("chart-errors.log", DateTime.Now + " - UI assign error: " + ex + "\n"); } catch {}
-                }
-            });
+            MainChartLegendItems.Add(new ChartLegendItemViewModel(
+                unitShortName,
+                new SolidColorBrush(Color.FromArgb(unitColor.Alpha, unitColor.Red, unitColor.Green, unitColor.Blue))));
         }
-        catch (Exception ex)
+
+        var demandColor = new SKColor(217, 69, 69);
+        var demandValues = points.Select(point => point.HeatDemand).ToArray();
+        series.Add(new LineSeries<double>
         {
-            try { System.IO.File.AppendAllText("chart-errors.log", DateTime.Now + " - BuildNetProductionCostChart error: " + ex + "\n"); } catch {}
-        }
+            Name = "Heat Demand",
+            Values = demandValues,
+            Stroke = new SolidColorPaint(demandColor) { StrokeThickness = 3 },
+            Fill = null,
+            GeometrySize = 0,
+            LineSmoothness = 1,
+            GeometryFill = null,
+            GeometryStroke = null
+        });
+
+        MainChartLegendItems.Add(new ChartLegendItemViewModel(
+            "Heat Demand",
+            new SolidColorBrush(Color.FromArgb(demandColor.Alpha, demandColor.Red, demandColor.Green, demandColor.Blue))));
+
+        NetProductionCostSeries = series.ToArray();
+        NetProductionCostXAxes = new Axis[]
+        {
+            new Axis
+            {
+                Labels = labels,
+                LabelsRotation = 45,
+                TextSize = 11,
+                LabelsPaint = new SolidColorPaint(SKColors.White),
+                NamePaint = new SolidColorPaint(SKColors.White),
+                Name = "Time"
+            }
+        };
+        
+        NetProductionCostYAxes = new Axis[]
+        {
+            new Axis
+            {
+                Name = "Heat Produced (MWh)",
+                MinLimit = 0,
+                TextSize = 11,
+                LabelsPaint = new SolidColorPaint(SKColors.White),
+                NamePaint = new SolidColorPaint(SKColors.White)
+            }
+        };
     }
 
     private static void BuildElectricityBalanceSeries(
@@ -578,7 +556,7 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
 
     private string[] GetScenarioUnitOrderedShortNames(OptimizationResult.ScenarioOption scenario)
     {
-        // Get all available units from asset manager, ordered by scenario preference
+// Get all available units from asset manager, ordered by scenario preference
         var allUnits = assetManagerViewModel.Units
             .Where(u => u.IsAvailable)
             .Select(u => u.ShortName)
@@ -588,7 +566,6 @@ public class OptimizerViewModel : ViewModelBase, IDisposable
             ? new[] { "GB1", "GB2", "GB3", "OB1" }
             : new[] { "GB1", "GB2", "GM1", "EB1" };
 
-        // Return preferred units first, then any additional custom units
         var ordered = preferredUnits.Where(allUnits.Contains).ToList();
         var customUnits = allUnits.Except(preferredUnits).OrderBy(x => x);
         ordered.AddRange(customUnits);

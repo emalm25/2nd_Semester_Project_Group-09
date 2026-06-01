@@ -151,12 +151,12 @@ public class SourceDataViewModel : ViewModelBase
 
         // Determine colors based on the selected period
         SKColor heatColor = selectedPeriod == Periods[0]
-            ? SKColors.RoyalBlue      // Winter: Azul
-            : SKColors.OrangeRed;     // Summer: Naranjado
+            ? SKColors.RoyalBlue     
+            : SKColors.OrangeRed;     
 
         SKColor priceColor = selectedPeriod == Periods[0]
-            ? SKColors.ForestGreen    // Winter: Verde
-            : SKColors.Gold;          // Summer: Amarillo
+            ? SKColors.ForestGreen   
+            : SKColors.Gold;        
 
         HeatDemandSeries = new ISeries[]
         {
